@@ -52,10 +52,6 @@ namespace wearable {
         size_t sequenceNumber = 0;
     };
 
-    //    template <typename S>
-    //    void castVectorOfSensorPtr(const VectorOfSensorPtr<const sensor::ISensor>& isensors,
-    //                               VectorOfSensorPtr<const S>& sensors);
-
     class IWear;
 } // namespace wearable
 
