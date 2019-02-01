@@ -825,6 +825,13 @@ void IWearRemapper::onRead(msg::WearableData& receivedWearData)
     }
 }
 
+yarp::os::Stamp IWearRemapper::getLastInputStamp()
+{
+    std::lock_guard<std::recursive_mutex> lock(pImpl->mutex);
+    // Stamp count should be always zero
+    return yarp::os::Stamp(0, getTimeStamp().time);
+}
+
 WearableName IWearRemapper::getWearableName() const
 {
     std::lock_guard<std::recursive_mutex> lock(pImpl->mutex);
