@@ -40,7 +40,7 @@ public:
     yarp::os::Network network;
     TimeStamp timestamp;
     bool firstRun = true;
-    bool useRPC = false;
+    bool useRPC = true;
 
     mutable std::recursive_mutex mutex;
 
@@ -136,24 +136,37 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
     }
 
     // RPC ports
-    // The usage of rpc port is optional depending wether or not the parameter is present
-    yarp::os::Bottle* inputRPCPortsNamesList = nullptr;
-    if (!config.check("wearableRPCPorts"))
-    {
-        yInfo() << logPrefix << "wearableRPCPorts does not exist. RPC port will not be used";
+    if (!(config.check("useRPC"))) {
+        yWarning() << logPrefix << "OPTIONAL parameter useRPC NOT found";
     }
-    else
-    {
-        pImpl->useRPC = true;
-        if (!config.find("wearableRPCPorts").isList()) {
-            yError() << logPrefix << "wearableRPCPorts option is not a list";
-            return false;
+    else {
+        if (!config.find("useRPC").isBool()) {
+            yError() << logPrefix << "useRPC option is not a bool";
         }
-        inputRPCPortsNamesList = config.find("wearableRPCPorts").asList();
-        for (unsigned i = 0; i < inputRPCPortsNamesList->size(); ++i) {
-            if (!inputRPCPortsNamesList->get(i).isString()) {
-                yError() << logPrefix << "ith entry of wearableRPCPorts list is not a string";
+        pImpl->useRPC = config.find("useRPC").asBool();
+        yWarning() << "useRPC set to" << pImpl->useRPC;
+    }
+
+    yarp::os::Bottle* inputRPCPortsNamesList = nullptr;
+    if (pImpl->useRPC)
+    {
+        if (!config.check("wearableRPCPorts"))
+        {
+            yInfo() << logPrefix << "wearableRPCPorts parameter does not exist. RPC port will not be used";
+            pImpl->useRPC = false;
+        }
+        else
+        {
+            if (!config.find("wearableRPCPorts").isList()) {
+                yError() << logPrefix << "wearableRPCPorts option is not a list";
                 return false;
+            }
+            inputRPCPortsNamesList = config.find("wearableRPCPorts").asList();
+            for (unsigned i = 0; i < inputRPCPortsNamesList->size(); ++i) {
+                if (!inputRPCPortsNamesList->get(i).isString()) {
+                    yError() << logPrefix << "ith entry of wearableRPCPorts list is not a string";
+                    return false;
+                }
             }
         }
     }
