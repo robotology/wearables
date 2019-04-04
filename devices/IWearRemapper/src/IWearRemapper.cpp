@@ -51,7 +51,6 @@ public:
     std::map<wearable::sensor::SensorName, size_t> sensorNameToIndex;
     std::vector<std::string> inputDataPortsNamesVector;
 
-
     // Sensors stored for exposing wearable::IWear
     std::map<std::string, std::shared_ptr<sensor::impl::Accelerometer>> accelerometers;
     std::map<std::string, std::shared_ptr<sensor::impl::EmgSensor>> emgSensors;
@@ -150,15 +149,13 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
     }
 
     yarp::os::Bottle* inputRPCPortsNamesList = nullptr;
-    if (pImpl->useRPC)
-    {
-        if (!config.check("wearableRPCPorts"))
-        {
-            yInfo() << logPrefix << "wearableRPCPorts parameter does not exist. RPC port will not be used";
+    if (pImpl->useRPC) {
+        if (!config.check("wearableRPCPorts")) {
+            yInfo() << logPrefix
+                    << "wearableRPCPorts parameter does not exist. RPC port will not be used";
             pImpl->useRPC = false;
         }
-        else
-        {
+        else {
             if (!config.find("wearableRPCPorts").isList()) {
                 yError() << logPrefix << "wearableRPCPorts option is not a list";
                 return false;
@@ -187,15 +184,13 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
     std::string outputPortName = config.find("outputPortName").asString();
 
     // Convert list to vector
-//    std::vector<std::string> inputDataPortsNamesVector;
     for (unsigned i = 0; i < inputDataPortsNamesList->size(); ++i) {
         pImpl->inputDataPortsNamesVector.emplace_back(inputDataPortsNamesList->get(i).asString());
     }
 
     // Convert list to vector
     std::vector<std::string> inputRPCPortsNamesVector;
-    if (pImpl->useRPC)
-    {
+    if (pImpl->useRPC) {
         for (unsigned i = 0; i < inputRPCPortsNamesList->size(); ++i) {
             inputRPCPortsNamesVector.emplace_back(inputRPCPortsNamesList->get(i).asString());
         }
@@ -206,15 +201,13 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
         yInfo() << logPrefix << "*** Wearable Data Port" << i + 1 << "  :"
                 << pImpl->inputDataPortsNamesVector[i];
     }
-    if (pImpl->useRPC)
-    {
+    if (pImpl->useRPC) {
         for (unsigned i = 0; i < pImpl->inputDataPortsNamesVector.size(); ++i) {
             yInfo() << logPrefix << "*** Wearable RPC Port" << i + 1 << "   :"
                     << inputRPCPortsNamesVector[i];
         }
     }
-    else
-    {
+    else {
         yInfo() << logPrefix << "*** Wearable RPC Port not configured";
     }
     yInfo() << logPrefix << "*** Output port            :" << outputPortName;
@@ -256,8 +249,7 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
     // ====================
     // OPEN INPUT RPC PORTS
     // ====================
-    if(pImpl->useRPC)
-    {
+    if (pImpl->useRPC) {
         yDebug() << logPrefix << "Opening input RPC ports";
 
         if (pImpl->inputDataPortsNamesVector.size() != inputRPCPortsNamesVector.size()) {
@@ -375,27 +367,26 @@ bool IWearRemapper::close()
 
 void IWearRemapper::run()
 {
-    if(yarp::os::Network::checkNetwork())
-    {
-
+    if (yarp::os::Network::checkNetwork()) {
         for (unsigned i = 0; i < pImpl->inputPortsWearData.size(); ++i) {
             if (!yarp::os::Network::isConnected(pImpl->inputDataPortsNamesVector[i],
                                                 pImpl->inputPortsWearData.back()->getName())) {
-                yWarning() <<"The ports are not connected: "<<pImpl->inputDataPortsNamesVector[i]<<" , "<<pImpl->inputPortsWearData.back()->getName();
-                yInfo() <<"Trying to connect them ...";
+                yWarning() << "The ports are not connected: " << pImpl->inputDataPortsNamesVector[i]
+                           << " , " << pImpl->inputPortsWearData.back()->getName();
+                yInfo() << "Trying to connect them ...";
                 if (!yarp::os::Network::connect(pImpl->inputDataPortsNamesVector[i],
                                                 pImpl->inputPortsWearData.back()->getName())) {
-                    yError() << logPrefix << "Failed to connect " << pImpl->inputDataPortsNamesVector[i]
-                                << " with " << pImpl->inputPortsWearData.back()->getName();
+                    yError() << logPrefix << "Failed to connect "
+                             << pImpl->inputDataPortsNamesVector[i] << " with "
+                             << pImpl->inputPortsWearData.back()->getName();
                 }
             }
         }
     }
     else {
-        yWarning()<<"[IWearRemapper::run] It can't find the yarp server";
+        yWarning() << "[IWearRemapper::run] It can't find the yarp server";
     }
     return;
-
 }
 
 const std::map<msg::SensorStatus, sensor::SensorStatus> MapSensorStatus = {
@@ -1011,7 +1002,8 @@ IWearRemapper::impl::getSensor(const sensor::SensorName name,
                                const sensor::SensorType type,
                                std::map<std::string, SensorPtr<SensorImpl>>& storage)
 {
-    // TODO check if this check on the sensor name is required, and how it is done in case rpc is not available
+    // TODO check if this check on the sensor name is required, and how it is done in case rpc is
+    // not available
     if (useRPC && !validSensorName(name, type)) {
         yError() << logPrefix << "Sensor" << name << "not found in the list read from the wrapper";
         return nullptr;
