@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<robot name="ftbox_ianalogsensor_to_iwear" build=0 portprefix="">
+
+<!-- First level devices section - force-torque-sensors -->
+<device type="canBusAnalogSensor" name="ftBox_1">
+    <param name="canbusDevice"> "ecan" </param>
+    <param name="physDevice"> "ecan" </param>
+    <param name="canDeviceNum"> 0 </param>
+    <param name="canAddress"> 0x01 </param>
+    <param name="format"> 16 </param>
+    <param name="channels"> 6 </param>
+    <param name="period"> 5 </param>
+    <param name="useCalibration"> 1 </param>
+    <param name="diagnostic"> 1 </param>
+</device>
+<device type="canBusAnalogSensor" name="ftBox_2">
+    <param name="canbusDevice"> "ecan" </param>
+    <param name="physDevice"> "ecan" </param>
+    <param name="canDeviceNum"> 0 </param>
+    <param name="canAddress"> 0x02 </param>
+    <param name="format"> 16 </param>
+    <param name="channels"> 6 </param>
+    <param name="period"> 5 </param>
+    <param name="useCalibration"> 1 </param>
+    <param name="diagnostic"> 1 </param>
+</device>
+<device type="canBusAnalogSensor" name="ftBox_3">
+    <param name="canbusDevice"> "ecan" </param>
+    <param name="physDevice"> "ecan" </param>
+    <param name="canDeviceNum"> 0 </param>
+    <param name="canAddress"> 0x03 </param>
+    <param name="format"> 16 </param>
+    <param name="channels"> 6 </param>
+    <param name="period"> 5 </param>
+    <param name="useCalibration"> 1 </param>
+    <param name="diagnostic"> 1 </param>
+</device>
+<device type="canBusAnalogSensor" name="ftBox_4">
+    <param name="canbusDevice"> "ecan" </param>
+    <param name="physDevice"> "ecan" </param>
+    <param name="canDeviceNum"> 0 </param>
+    <param name="canAddress"> 0x04 </param>
+    <param name="format"> 16 </param>
+    <param name="channels"> 6 </param>
+    <param name="period"> 5 </param>
+    <param name="useCalibration"> 1 </param>
+    <param name="diagnostic"> 1 </param>
+</device>
+
+<!-- Analog wrappers sections, required to forward devices data on dedicated yarp ports -->
+<!-- Analog wrappers sections - ftSensors devices wrappers -->
+<device  type="analogServer" name="ftSens1Wrapper">
+    <param name="period"> 10 </param>
+    <param name="name"> /ft/ftBox_1/analog:o </param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FirstStrain"> ftBox_1 </elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+<device  type="analogServer" name="ftSens2Wrapper">
+    <param name="period"> 10 </param>
+    <param name="name"> /ft/ftBox_2/analog:o </param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FirstStrain"> ftBox_2 </elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+<device  type="analogServer" name="ftSens3Wrapper">
+    <param name="period"> 10 </param>
+    <param name="name"> /ft/ftBox_3/analog:o </param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FirstStrain"> ftBox_3 </elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+<device  type="analogServer" name="ftSens4Wrapper">
+    <param name="period"> 10 </param>
+    <param name="name"> /ft/ftBox_4/analog:o </param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FirstStrain"> ftBox_4 </elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+
+
+<device type="ianalogsensor_to_iwear" name="FTBoxIAnalogSensorToIWear">
+    <param name="sensorName">FTBoxFTSensors</param>
+    <param name="wearableName">FTBox</param>
+    <param name="numberOfChannels">24</param>
+    <param name="channelOffset">0</param>
+    <param name="wearableSensorType">ForceTorque6DSensor</param>
+    <param name="getGroundReactionFT">false</param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FTBoxIAnalogSensorToIWearLabel1">ftBox_1</elem>
+            <elem name="FTBoxIAnalogSensorToIWearLabel2">ftBox_2</elem>
+            <elem name="FTBoxIAnalogSensorToIWearLabel3">ftBox_3</elem>
+            <elem name="FTBoxIAnalogSensorToIWearLabel4">ftBox_4</elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+
+<device type="iwear_wrapper" name="FTBoxIWearWrapper">
+    <param name="period">0.01</param>
+    <param name="dataPortName">/FTBox/WearableData/data:o</param>
+    <param name="rpcPortName">/FTBox/WearableData/metadataRpc:o</param>
+    <action phase="startup" level="5" type="attach">
+        <paramlist name="networks">
+            <elem name="FTBoxIWearWrapperLabel">FTBoxIAnalogSensorToIWear</elem>
+        </paramlist>
+    </action>
+    <action phase="shutdown" level="5" type="detach"/>
+</device>
+
+</robot>
