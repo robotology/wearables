@@ -534,7 +534,7 @@ bool IAnalogSensorToIWear::attach(yarp::dev::PolyDriver* poly)
 
 bool IAnalogSensorToIWear::detach()
 {
-    pImpl->handler->interface = nullptr;
+    pImpl->handler = nullptr;
     return true;
 }
 
