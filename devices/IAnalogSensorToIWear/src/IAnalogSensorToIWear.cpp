@@ -412,6 +412,7 @@ bool IAnalogSensorToIWear::open(yarp::os::Searchable& config)
 bool IAnalogSensorToIWear::close()
 {
     detach();
+    pImpl->iSensor.reset();
     return true;
 }
 
@@ -522,7 +523,6 @@ bool IAnalogSensorToIWear::attach(yarp::dev::PolyDriver* poly)
 
 bool IAnalogSensorToIWear::detach()
 {
-    pImpl->iSensor.reset();
     return true;
 }
 
