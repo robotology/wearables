@@ -419,6 +419,7 @@ bool IAnalogSensorToIWear::open(yarp::os::Searchable& config)
     // INITIALIZE THE DEVICE
     // =====================
 
+    pImpl->handler = new Impl::IAnalogSensorHandler();
     pImpl->handler->buffer.resize(pImpl->options.numberOfChannels);
 
     return true;
