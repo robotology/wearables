@@ -46,7 +46,7 @@ public:
     ParsedOptions options;
 
     class IAnalogSensorHandler;
-    IAnalogSensorHandler* handler = nullptr;
+    std::shared_ptr<IAnalogSensorHandler> handler = nullptr;
 
     class ForceTorque6DSensor;
     class Force3DSensor;
@@ -176,9 +176,9 @@ class IAnalogSensorToIWear::Impl::ForceTorque6DSensor : public IForceTorque6DSen
 public:
     unsigned offset = 0;
     bool groundReactionFT;
-    IAnalogSensorHandler* handler;
+    std::shared_ptr<IAnalogSensorHandler> handler;
 
-    ForceTorque6DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, IAnalogSensorHandler* analogSensorHandler = nullptr)
+    ForceTorque6DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, std::shared_ptr<IAnalogSensorHandler> analogSensorHandler = nullptr)
         : IForceTorque6DSensor(name, status), handler(analogSensorHandler)
     {}
 
@@ -212,9 +212,9 @@ class IAnalogSensorToIWear::Impl::Force3DSensor : public IForce3DSensor
 {
 public:
     unsigned offset = 0;
-    IAnalogSensorHandler* handler;
+    std::shared_ptr<IAnalogSensorHandler> handler;
 
-    Force3DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, IAnalogSensorHandler* analogSensorHandler = nullptr)
+    Force3DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, std::shared_ptr<IAnalogSensorHandler> analogSensorHandler = nullptr)
         : IForce3DSensor(name, status), handler(analogSensorHandler)
     {}
 
@@ -236,9 +236,9 @@ class IAnalogSensorToIWear::Impl::Torque3DSensor : public ITorque3DSensor
 {
 public:
     unsigned offset = 0;
-    IAnalogSensorHandler* handler;
+    std::shared_ptr<IAnalogSensorHandler> handler;
 
-    Torque3DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, IAnalogSensorHandler* analogSensorHandler = nullptr)
+    Torque3DSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, std::shared_ptr<IAnalogSensorHandler> analogSensorHandler = nullptr)
         : ITorque3DSensor(name, status), handler(analogSensorHandler)
     {}
 
@@ -260,9 +260,9 @@ class IAnalogSensorToIWear::Impl::TemperatureSensor : public ITemperatureSensor
 {
 public:
     unsigned offset = 0;
-    IAnalogSensorHandler* handler;
+    std::shared_ptr<IAnalogSensorHandler> handler;
 
-    TemperatureSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, IAnalogSensorHandler* analogSensorHandler = nullptr)
+    TemperatureSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, std::shared_ptr<IAnalogSensorHandler> analogSensorHandler = nullptr)
         : ITemperatureSensor(name, status), handler(analogSensorHandler)
     {}
 
@@ -284,9 +284,9 @@ class IAnalogSensorToIWear::Impl::SkinSensor: public ISkinSensor
 {
 public:
     unsigned offset = 0;
-    IAnalogSensorHandler* handler;
+    std::shared_ptr<IAnalogSensorHandler> handler;
 
-    SkinSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, IAnalogSensorHandler* analogSensorHandler = nullptr)
+    SkinSensor(SensorName name, SensorStatus status = SensorStatus::Unknown, std::shared_ptr<IAnalogSensorHandler> analogSensorHandler = nullptr)
         : ISkinSensor(name, status), handler(analogSensorHandler)
     {}
 
@@ -419,7 +419,7 @@ bool IAnalogSensorToIWear::open(yarp::os::Searchable& config)
     // INITIALIZE THE DEVICE
     // =====================
 
-    pImpl->handler = new Impl::IAnalogSensorHandler();
+    pImpl->handler = std::make_shared<Impl::IAnalogSensorHandler>();
     pImpl->handler->buffer.resize(pImpl->options.numberOfChannels);
 
     return true;
@@ -490,7 +490,7 @@ bool IAnalogSensorToIWear::attach(yarp::dev::PolyDriver* poly)
         return false;
     }
 
-    if (pImpl->handler->interface || !poly->view(pImpl->handler->interface) || !pImpl->handler->interface) {
+    if (!(!pImpl->handler->interface && poly->view(pImpl->handler->interface) && pImpl->handler->interface)) {
         yError() << LogPrefix << "Failed to view the IAnalogSensor interface from the PolyDriver";
         return false;
     }
