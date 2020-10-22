@@ -11,3 +11,5 @@ function brewInstallOrUpgrade {
         HOMEBREW_NO_AUTO_UPDATE=1 brew install "$1" 
     fi
 }
+
+echo 'brewInstallOrUpgrade function added'
