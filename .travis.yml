@@ -66,7 +66,7 @@ stage_osx:
     - export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEPS_INSTALL_PREFIX
     - export CMAKE_BUILD_OPTIONS=""
     # Define brewInstallOrUpgrade function
-    - sh .ci/brewInstallOrUpgrade.sh
+    - source .ci/brewInstallOrUpgrade.sh
     # Setup ccache
     - brewInstallOrUpgrade ccache
     - export PATH="/usr/local/opt/ccache/libexec:$PATH"
