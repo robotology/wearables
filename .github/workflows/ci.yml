@@ -13,10 +13,10 @@ on:
     - cron: '0 2 * * *'
     
 env:
-    vcpkg_robotology_TAG: v0.0.3
-    YCM_TAG: v0.11.1
-    YARP_TAG: v3.3.2
-    iDynTree_TAG: v1.1.0   
+    vcpkg_robotology_TAG: v0.5.0
+    YCM_TAG: v0.12.0
+    YARP_TAG: v3.4.1
+    iDynTree_TAG: v2.0.0   
     # Overwrite the VCPKG_INSTALLATION_ROOT env variable defined by Github Actions to point to our vcpkg
     VCPKG_INSTALLATION_ROOT: C:\robotology\vcpkg
     
@@ -53,16 +53,14 @@ jobs:
         - name: Dependencies [Windows]
           if: matrix.os == 'windows-latest'
           run: |
-            # To avoid spending a huge time compiling vcpkg dependencies, we download a root that comes precompiled with all the ports that we need
+            # To avoid spending a huge time compiling vcpkg dependencies, we download an archive  that comes precompiled with all the ports that we need 
             choco install -y wget unzip
-            
-            # To avoid problems with non-relocatable packages, we unzip the archive exactly in the same C:/robotology/vcpkg 
+            # To avoid problems with non-relocatable packages, we unzip the archive exactly in the same directory
             # that has been used to create the pre-compiled archive
             cd C:/
-            md C:/robotology
-            md C:/robotology/vcpkg
             wget https://github.com/robotology/robotology-superbuild-dependencies-vcpkg/releases/download/${env:vcpkg_robotology_TAG}/vcpkg-robotology.zip
-            unzip vcpkg-robotology.zip -d C:/robotology/vcpkg
+            unzip vcpkg-robotology.zip -d C:/
+            rm vcpkg-robotology.zip
                
         - name: Dependencies [macOS]
           if: matrix.os == 'macOS-latest'
