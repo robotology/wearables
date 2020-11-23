@@ -176,7 +176,7 @@ jobs:
             cmake -A x64 -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake \
                          -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/install/deps \
                          -DCMAKE_BUILD_TPYE=${{matrix.build_type}} \
-                         -DXSENS_MVN_USE_SDK:BOOL=OFF
+                         -DXSENS_MVN_USE_SDK:BOOL=OFF \
                          -DCMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/install ..
             
         - name: Configure [Ubuntu/macOS]
