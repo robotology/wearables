@@ -8,7 +8,7 @@ Here following there is a list of the required dependencies you need for using t
 * [CMake](https://cmake.org/download/) open-source, cross-platform family of tools designed to build, test and package software.
 * [YARP](http://www.yarp.it/) software package to handle the data comunication.
 
-It must be noted that `YARP`, togheter with a subset of these dependencies, can be directly installed together in one place using the [robotology-superbuild](https://github.com/robotology/robotology-superbuild) enabling its [`Human-Dynamics` profile](https://github.com/robotology/robotology-superbuild#human-dynamics). 
+It must be noted that `YARP`, together with a subset of the optional dependencies, can be installed together in one place using the [robotology-superbuild](https://github.com/robotology/robotology-superbuild) enabling its [`Human-Dynamics` profile](https://github.com/robotology/robotology-superbuild#human-dynamics). 
 
 ## Build the suite
 ### Linux/macOS
