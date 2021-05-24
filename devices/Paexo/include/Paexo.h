@@ -93,6 +93,9 @@ public:
     SensorPtr<const sensor::ITorque3DSensor>
     getTorque3DSensor(const sensor::SensorName name) const override;
 
+    SensorPtr<const sensor::IForceTorque6DSensor>
+    getForceTorque6DSensor(const sensor::SensorName name) const override;
+
     // IMPLEMENTED ACTUATORS
     // ---------------------
 
@@ -101,9 +104,6 @@ public:
 
     // UNIMPLEMENTED SENSORS
     // ---------------------
-
-    inline SensorPtr<const sensor::IForceTorque6DSensor>
-    getForceTorque6DSensor(const sensor::SensorName /*name*/) const override;
 
     inline SensorPtr<const sensor::IVirtualLinkKinSensor>
     getVirtualLinkKinSensor(const sensor::SensorName /*name*/) const override;
@@ -151,12 +151,6 @@ public:
     getHeaterActuator(const actuator::ActuatorName) const override;
 
 };
-
-inline wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor>
-wearable::devices::Paexo::getForceTorque6DSensor(const sensor::SensorName /*name*/) const
-{
-    return nullptr;
-}
 
 inline wearable::SensorPtr<const wearable::sensor::IVirtualLinkKinSensor>
 wearable::devices::Paexo::getVirtualLinkKinSensor(const sensor::SensorName /*name*/) const

@@ -79,6 +79,13 @@ public:
     class PaexoTorque3DSensor;
     SensorPtr<PaexoTorque3DSensor> paexoTorqueSensor;
 
+    // 6D Force-Torque Sensors
+    std::string ftSensorPrefix;
+    const std::string ftSensorName = "ArmForceTorque";
+    class PaexoForceTorque6DSensor;
+    SensorPtr<PaexoForceTorque6DSensor> paexoLeftArmFTSensor;
+    SensorPtr<PaexoForceTorque6DSensor> paexoRightArmFTSensor;
+
     // Motor Actuator
     std::string motorActuatorPrefix;
     const std::string motorActuatorName = "Actuator";
@@ -226,6 +233,12 @@ bool Paexo::open(yarp::os::Searchable& config)
     pImpl->torqueSensorPrefix = getWearableName() + sensor::ITorque3DSensor::getPrefix();
     pImpl->paexoTorqueSensor = SensorPtr<PaexoImpl::PaexoTorque3DSensor>{std::make_shared<PaexoImpl::PaexoTorque3DSensor>(pImpl.get(), pImpl->torqueSensorPrefix + pImpl->torqueSensorName)};
 
+    pImpl->ftSensorPrefix = getWearableName() + sensor::IForceTorque6DSensor::getPrefix();
+    pImpl->paexoLeftArmFTSensor = SensorPtr<PaexoImpl::PaexoForceTorque6DSensor>{std::make_shared<PaexoImpl::PaexoForceTorque6DSensor>(pImpl.get(),
+                                                                                                                                       pImpl->ftSensorPrefix + "Left" + pImpl->ftSensorName)};
+    pImpl->paexoRightArmFTSensor = SensorPtr<PaexoImpl::PaexoForceTorque6DSensor>{std::make_shared<PaexoImpl::PaexoForceTorque6DSensor>(pImpl.get(),
+                                                                                                                                        pImpl->ftSensorPrefix + "Right" + pImpl->ftSensorName)};
+
     // Initialize wearable actuators
     pImpl->motorActuatorPrefix = getWearableName() + actuator::IMotor::getPrefix();
     pImpl->paexoMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
@@ -357,6 +370,50 @@ public:
         torque[2] = 0.0;
         return true;
     }
+};
+
+// ===========================================
+// Paexo implementation of ForceTorque6DSensor
+// ===========================================
+class Paexo::PaexoImpl::PaexoForceTorque6DSensor : public wearable::sensor::IForceTorque6DSensor
+{
+public:
+    Paexo::PaexoImpl* paexoImpl = nullptr;
+    std::vector<double> ftData;
+
+    PaexoForceTorque6DSensor(Paexo::PaexoImpl* impl,
+                             const wearable::sensor::SensorName name = {},
+                             const wearable::sensor::SensorStatus status = wearable::sensor::SensorStatus::Ok) // Default sensor status is Ok, to be updated using node status from iFeelDriver
+        : IForceTorque6DSensor(name, status)
+        , paexoImpl(impl)
+    {
+        // Initialization
+        ftData.resize(6);
+    }
+
+    ~PaexoForceTorque6DSensor() override = default;
+
+    void setStatus(const wearable::sensor::SensorStatus status) { m_status = status; }
+
+    bool getForceTorque6D(Vector3& force3D, Vector3& torque3D) const override
+    {
+        // TODO: Get FT Data from front or back FT using iFeelDriver
+
+        assert(paexoImpl != nullptr);
+
+        std::lock_guard<std::mutex> lock(paexoImpl->mutex);
+
+        force3D[0] = ftData[0];
+        force3D[1] = ftData[1];
+        force3D[2] = ftData[2];
+
+        torque3D[0] = ftData[3];
+        torque3D[1] = ftData[4];
+        torque3D[2] = ftData[5];
+
+        return true;
+    }
+
 };
 
 // =======================================
@@ -593,6 +650,11 @@ Paexo::getSensors(const wearable::sensor::SensorType aType) const
             outVec.push_back(static_cast<SensorPtr<sensor::ISensor>>(pImpl->paexoTorqueSensor));
             break;
         }
+    case sensor::SensorType::ForceTorque6DSensor: {
+            outVec.push_back(static_cast<SensorPtr<sensor::ISensor>>(pImpl->paexoLeftArmFTSensor));
+            outVec.push_back(static_cast<SensorPtr<sensor::ISensor>>(pImpl->paexoRightArmFTSensor));
+            break;
+        }
         default: {
             return {};
         }
@@ -688,6 +750,32 @@ Paexo::getTorque3DSensor(const wearable::sensor::SensorName name) const
     // Return a shared point to the required sensor
     return dynamic_cast<wearable::SensorPtr<const wearable::sensor::ITorque3DSensor>&>(
         *pImpl->paexoTorqueSensor);
+}
+
+// -------------------
+// FORCE TORQUE Sensor
+// -------------------
+wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor>
+wearable::devices::Paexo::getForceTorque6DSensor(const sensor::SensorName name) const
+{
+    // Check if user-provided name corresponds to an available sensor
+    if (name == pImpl->ftSensorPrefix + "Left" + pImpl->ftSensorName || name == pImpl->ftSensorPrefix + "Right" + pImpl->ftSensorName) {
+        yError() << LogPrefix << "Invalid sensor name " << name;
+        return nullptr;
+    }
+
+    // Return a shared point to the required sensor
+    // TODO: Return corresponding left and right sensors
+    wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor> ftSensor;
+    if (name.find("Left"))
+    {
+        ftSensor = dynamic_cast<wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor>&>(*pImpl->paexoLeftArmFTSensor);
+    }
+    else if (name.find("Right"))
+    {
+        ftSensor = dynamic_cast<wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor>&>(*pImpl->paexoRightArmFTSensor);
+    }
+    return ftSensor;
 }
 
 // ---------------
