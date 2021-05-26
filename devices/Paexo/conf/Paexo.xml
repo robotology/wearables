@@ -7,7 +7,7 @@
     <device type="serialport" name="SerialportDevice">
         <param name="verbose"> 0 </param>
         <!--param name="comport"> COM2 </param-->        <!--  //windows     -->
-        <param name="comport">  /dev/ttyACM1 </param>   <!--    //linux     -->
+        <param name="comport">  /dev/ttyACM2 </param>   <!--    //linux     -->
         <param name="baudrate"> 115200 </param>
         <param name="xonlim"> 0 </param>
         <param name="xofflim"> 0 </param>
@@ -33,6 +33,14 @@
     <device type="paexo" name="PaexoWearableDevice">
         <param name="period">0.01</param>
         <param name="portsPrefixName">/wearable/paexo</param>
+        <group name="iFeelDriver">
+            <group name="serial-config">
+                <param name="serial-port-name">/dev/ttyACM1</param>
+                <param name="serial-timeout-ms">1000</param>
+            </group>
+            <param name="ifeeldriver-config-timeout-s">5</param>
+            <param name="ifeeldriver-config-nodes">(2)</param>
+        </group>
         <action phase="startup" level="5" type="attach">
             <paramlist name="networks">
                 <elem name="PaexoWearableDeviceLabel">SerialportDevice</elem>

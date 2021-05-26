@@ -4,6 +4,9 @@
 #* CopyPolicy: Released under the terms of the LGPLv2.1 or later, see LGPL.TXT
 #*/
 
+## Find iFeelDriver
+find_package(iFeelDriver REQUIRED)
+
 # Compile the plugin by default
 yarp_prepare_plugin(paexo  TYPE wearable::devices::Paexo
                     INCLUDE include/Paexo.h
@@ -21,10 +24,13 @@ target_link_libraries(Paexo
     PUBLIC
     YARP::YARP_dev
     YARP::YARP_init
-    Wearable::IWear)
+    Wearable::IWear
+    iFeelDriver::iFeelDriver
+    )
 
 yarp_install(TARGETS Paexo
              COMPONENT runtime
              LIBRARY DESTINATION ${YARP_DYNAMIC_PLUGINS_INSTALL_DIR}
              ARCHIVE DESTINATION ${YARP_STATIC_PLUGINS_INSTALL_DIR}
-             YARP_INI DESTINATION ${YARP_PLUGIN_MANIFESTS_INSTALL_DIR})
+             YARP_INI DESTINATION ${YARP_PLUGIN_MANIFESTS_INSTALL_DIR}
+             )
