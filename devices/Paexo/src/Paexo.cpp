@@ -500,9 +500,12 @@ public:
         // TODO: Cleanup ftData buffer handling
         paexoImpl->ifeelData = paexoImpl->ifeelDriver->getData();
 
+        auto it = paexoImpl->ifeelData.FTShoeNodes.begin();
+        iFeel::Utils::DataTypes::NodeID nodeID = it->first;
+
         if (this->getSensorName().find("Left") != std::string::npos)
         {
-           iFeel::ForceTorque ftData = paexoImpl->ifeelData.FTShoeNodes[2]->getFrontFT();
+           iFeel::ForceTorque ftData = paexoImpl->ifeelData.FTShoeNodes[nodeID]->getFrontFT();
 
            force3D[0] = ftData.x;
            force3D[1] = ftData.y;
@@ -516,7 +519,7 @@ public:
 
         if (this->getSensorName().find("Right") != std::string::npos)
         {
-            iFeel::ForceTorque ftData = paexoImpl->ifeelData.FTShoeNodes[2]->getBackFT();
+            iFeel::ForceTorque ftData = paexoImpl->ifeelData.FTShoeNodes[nodeID]->getBackFT();
 
             force3D[0] = ftData.x;
             force3D[1] = ftData.y;
