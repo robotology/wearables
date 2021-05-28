@@ -4,8 +4,21 @@
 #* CopyPolicy: Released under the terms of the LGPLv2.1 or later, see LGPL.TXT
 #*/
 
-## Find iFeelDriver
-find_package(iFeelDriver REQUIRED)
+# Flag to enable iFeelDriver in Paexo wearable device
+option(ENABLE_PAEXO_USE_iFEELDriver "Flag that enables building Paexo wearable device with iFeelDriver" OFF)
+
+if (ENABLE_PAEXO_USE_iFEELDriver)
+
+    ## Find iFeelDriver
+    find_package(iFeelDriver REQUIRED)
+
+endif()
+
+# Generate cmake config.file
+configure_file (
+  "${CMAKE_CURRENT_SOURCE_DIR}/conf/paexo-cmake-config.h.in"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/paexo-cmake-config.h"
+  @ONLY)
 
 # Compile the plugin by default
 yarp_prepare_plugin(paexo  TYPE wearable::devices::Paexo
@@ -25,8 +38,12 @@ target_link_libraries(Paexo
     YARP::YARP_dev
     YARP::YARP_init
     Wearable::IWear
-    iFeelDriver::iFeelDriver
     )
+
+if (ENABLE_PAEXO_USE_iFEELDriver)
+    target_link_libraries(Paexo PUBLIC iFeelDriver::iFeelDriver)
+    message(STATUS "Paexo: Compiling with iFeelDriver")
+endif()
 
 yarp_install(TARGETS Paexo
              COMPONENT runtime

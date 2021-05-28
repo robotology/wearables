@@ -17,6 +17,8 @@
 
 #include <yarp/os/PeriodicThread.h>
 
+#include "paexo-cmake-config.h"
+
 namespace wearable {
     namespace devices {
         class Paexo;
@@ -93,9 +95,16 @@ public:
     SensorPtr<const sensor::ITorque3DSensor>
     getTorque3DSensor(const sensor::SensorName name) const override;
 
+#ifdef ENABLE_PAEXO_USE_iFEELDriver
+
     SensorPtr<const sensor::IForceTorque6DSensor>
     getForceTorque6DSensor(const sensor::SensorName name) const override;
 
+#else
+    inline SensorPtr<const sensor::IForceTorque6DSensor>
+    getForceTorque6DSensor(const sensor::SensorName /*name*/) const override;
+
+#endif
     // IMPLEMENTED ACTUATORS
     // ---------------------
 
@@ -151,6 +160,14 @@ public:
     getHeaterActuator(const actuator::ActuatorName) const override;
 
 };
+
+#ifndef ENABLE_PAEXO_USE_iFEELDriver
+inline wearable::SensorPtr<const wearable::sensor::IForceTorque6DSensor>
+wearable::devices::Paexo::getForceTorque6DSensor(const sensor::SensorName /*name*/) const
+{
+    return nullptr;
+}
+#endif
 
 inline wearable::SensorPtr<const wearable::sensor::IVirtualLinkKinSensor>
 wearable::devices::Paexo::getVirtualLinkKinSensor(const sensor::SensorName /*name*/) const
