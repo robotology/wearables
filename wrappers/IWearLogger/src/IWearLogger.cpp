@@ -96,27 +96,42 @@ public:
         return res;
     }
 
+    inline std::string getValidName(std::string& name, const char& c)
+    {
+        // Replace special characters with desired char c
+        std::replace(name.begin(), name.end(), '#', c);
+        std::replace(name.begin(), name.end(), '@', c);
+        std::replace(name.begin(), name.end(), '/', c);
+        std::replace(name.begin(), name.end(), '(', c);
+        std::replace(name.begin(), name.end(), ')', c);
+
+        auto vecStr = split(name, wearable::Separator);
+
+        std::string validName;
+        for (auto& str : vecStr) {
+            if (validName.empty()) {
+                validName = str;
+            }
+            else {
+                validName = validName + std::to_string(c) + str;
+            }
+        }
+
+        return validName;
+    }
+
     inline std::string convertSensorNameToValidMatlabVarName(const std::string& sensorName)
     {
         std::string matlabName{sensorName};
-        // replace special characters with underscore
-        std::replace(matlabName.begin(), matlabName.end(), '#', '_');
-        std::replace(matlabName.begin(), matlabName.end(), '@', '_');
-        std::replace(matlabName.begin(), matlabName.end(), '/', '_');
-        std::replace(matlabName.begin(), matlabName.end(), '(', '_');
-        std::replace(matlabName.begin(), matlabName.end(), ')', '_');
 
-        auto vecStr = split(matlabName, wearable::Separator);
-        std::string validMatlabName;
-        for (auto& str : vecStr) {
-            if (validMatlabName.empty()) {
-                validMatlabName = str;
-            }
-            else {
-                validMatlabName = validMatlabName + "_" + str;
-            }
-        }
-        return validMatlabName;
+        return getValidName(matlabName, '_');
+    }
+
+    inline std::string convertSensorNameToValidYarpPortName(const std::string& sensorName)
+    {
+        std::string yarpPortName{sensorName};
+
+        return getValidName(yarpPortName, '/');
     }
 
     inline void
@@ -768,6 +783,11 @@ bool IWearLogger::impl::configureMatlabBufferManager(const std::string& sensorNa
         return false;
     }
 
+    return true;
+}
+
+bool IWearLogger::impl::configureYarpBufferManager(const std::string &sensorName)
+{
     return true;
 }
 
