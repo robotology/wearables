@@ -75,6 +75,9 @@ public:
     void checkAndLoadBooleanOption(yarp::os::Property& prop,
                                    const std::string& optionName,
                                    bool& option);
+
+    bool configureMatlabBufferManager(const std::string& sensorName, const size_t& channelSize);
+    bool configureYarpBufferManager(const std::string& sensorName);
     bool configureBufferManager();
 
     inline std::vector<std::string> split(const std::string& s, const std::string& delimiter)
@@ -752,6 +755,22 @@ bool IWearLogger::attach(yarp::dev::PolyDriver* poly)
     return true;
 }
 
+bool IWearLogger::impl::configureMatlabBufferManager(const std::string& sensorName, const size_t& channelSize)
+{
+    auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
+    wearable2MatlabNameLookup[sensorName] = channelName;
+
+    bool ok = bufferManager.addChannel({channelName, {channelSize, 1}});
+
+    if (!ok)
+    {
+        yError() << logPrefix << " matlab buffer manager configuration failed for " << sensorName;
+        return false;
+    }
+
+    return true;
+}
+
 bool IWearLogger::impl::configureBufferManager()
 {
     bool ok{true};
@@ -761,9 +780,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) accelerometer channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -772,9 +793,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (3, 1) EMG sensor channels value+normalization for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {3, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 3);
+            }
         }
     }
 
@@ -783,9 +806,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) 3d force sensor channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -794,9 +819,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (7, 1) 6D force torque sensor channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {7, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 7);
+            }
         }
     }
 
@@ -805,9 +832,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) free body acceleration sensor channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -816,9 +845,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) gyroscope channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -827,9 +858,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) magnetometer channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -838,9 +871,11 @@ bool IWearLogger::impl::configureBufferManager()
             std::string sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (5, 1) quaternion wxyz channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {5, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 5);
+            }
         }
     }
 
@@ -849,9 +884,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (8, 1) pose sensor (pos+quat) channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {8, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 8);
+            }
         }
     }
 
@@ -860,9 +897,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) pose sensor channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -871,9 +910,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (2, 1) temperature sensor channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {2, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 2);
+            }
         }
     }
 
@@ -882,9 +923,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) 3D torque sensor channels for " << sensorName
                     << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -893,9 +936,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (20, 1) pos+quat+v+omega+a+alpha channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {20, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 20);
+            }
         }
     }
 
@@ -904,9 +949,11 @@ bool IWearLogger::impl::configureBufferManager()
             auto sensorName = s->getSensorName();
             yInfo() << logPrefix << "Adding (4, 1) virtual joint kinematics channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {4, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
         }
     }
 
@@ -916,9 +963,11 @@ bool IWearLogger::impl::configureBufferManager()
             yInfo() << logPrefix
                     << "Adding (10, 1) rpy+vel+acc virtual spherical joint kinematics channels for "
                     << sensorName << " prefixed with sensor status.";
-            auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
-            wearable2MatlabNameLookup[sensorName] = channelName;
-            ok = ok && bufferManager.addChannel({channelName, {10, 1}});
+
+            if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureMatlabBufferManager(sensorName, 10);
+            }
         }
     }
 
