@@ -15,6 +15,8 @@
 #include <vector>
 #include <yarp/dev/PreciselyTimed.h>
 #include <yarp/os/LogStream.h>
+#include <yarp/os/Network.h>
+#include <yarp/os/BufferedPort.h>
 
 #include <yarp/telemetry/experimental/BufferManager.h>
 
@@ -174,6 +176,7 @@ public:
         virtualSphericalJointKinSensors;
 
     std::unordered_map<std::string, std::string> wearable2MatlabNameLookup;
+    std::unordered_map<std::string, std::unique_ptr<yarp::os::BufferedPort<yarp::os::Bottle>>> wearable2YarpPortLookup;
 };
 
 IWearLogger::IWearLogger()
@@ -788,6 +791,26 @@ bool IWearLogger::impl::configureMatlabBufferManager(const std::string& sensorNa
 
 bool IWearLogger::impl::configureYarpBufferManager(const std::string &sensorName)
 {
+    auto portName = convertSensorNameToValidYarpPortName(sensorName);
+
+    std::unique_ptr<yarp::os::BufferedPort<yarp::os::Bottle>> port = std::make_unique<yarp::os::BufferedPort<yarp::os::Bottle>>();
+
+    // Check yarp network initialization
+    if (!yarp::os::Network::isNetworkInitialized())
+    {
+        yInfo() << logPrefix << "Initializing yarp network";
+        yarp::os::Network::init();
+    }
+
+    // Open yarp port
+    if (!port->open(portName))
+    {
+        yError() << logPrefix << "Failed to open yarp port " << portName;
+        return false;
+    }
+
+    wearable2YarpPortLookup[sensorName] = std::move(port);
+
     return true;
 }
 
@@ -805,6 +828,12 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
+
         }
     }
 
@@ -817,6 +846,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 3);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -831,6 +865,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -843,6 +882,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 7);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -857,6 +901,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -869,6 +918,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -883,6 +937,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -895,6 +954,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 5);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -909,6 +973,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 8);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -921,6 +990,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -935,6 +1009,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 2);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -948,6 +1027,11 @@ bool IWearLogger::impl::configureBufferManager()
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
@@ -960,6 +1044,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 20);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
@@ -987,6 +1076,11 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP)
             {
                 ok = ok && configureMatlabBufferManager(sensorName, 10);
+            }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP)
+            {
+                ok = ok && configureYarpBufferManager(sensorName);
             }
         }
     }
