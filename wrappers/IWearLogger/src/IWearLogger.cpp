@@ -272,9 +272,10 @@ void IWearLogger::run()
             else {
 
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
+
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                         pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -304,10 +305,10 @@ void IWearLogger::run()
                 std::vector<double> saveVar;
                 saveVar.emplace_back(value);
                 saveVar.emplace_back(normalization);
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                         pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -334,10 +335,9 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
-
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -364,10 +364,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector6.begin(), vector6.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -394,10 +394,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -424,10 +424,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -454,10 +454,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -484,10 +484,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{quaternion.begin(), quaternion.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -517,10 +517,10 @@ void IWearLogger::run()
                 std::vector<double> saveVar;
                 std::copy(vector3.begin(), vector3.end(), std::back_inserter(saveVar));
                 std::copy(quaternion.begin(), quaternion.end(), std::back_inserter(saveVar));
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -547,10 +547,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -578,10 +578,10 @@ void IWearLogger::run()
             else {
                 std::vector<double> saveVar;
                 saveVar.emplace_back(value);
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -608,10 +608,10 @@ void IWearLogger::run()
             }
             else {
                 std::vector<double> saveVar{vector3.begin(), vector3.end()};
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -651,10 +651,10 @@ void IWearLogger::run()
                 std::copy(angularVel.begin(), angularVel.end(), std::back_inserter(saveVar));
                 std::copy(linearAcc.begin(), linearAcc.end(), std::back_inserter(saveVar));
                 std::copy(angularAcc.begin(), angularAcc.end(), std::back_inserter(saveVar));
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -688,10 +688,10 @@ void IWearLogger::run()
                 saveVar.emplace_back(jointPos);
                 saveVar.emplace_back(jointVel);
                 saveVar.emplace_back(jointAcc);
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -724,10 +724,10 @@ void IWearLogger::run()
                 std::copy(jointAngles.begin(), jointAngles.end(), std::back_inserter(saveVar));
                 std::copy(jointVel.begin(), jointVel.end(), std::back_inserter(saveVar));
                 std::copy(jointAcc.begin(), jointAcc.end(), std::back_inserter(saveVar));
+                pImpl->prefixVecWithSensorStatus(sensor, saveVar);
 
                 if (pImpl->loggerLevel == LoggerLevel::MATLAB || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
-                    pImpl->prefixVecWithSensorStatus(sensor, saveVar);
                     const auto& channelName =
                             pImpl->wearable2MatlabNameLookup.at(sensor->getSensorName());
                     pImpl->bufferManager.push_back(saveVar, timestamp.getTime(), channelName);
@@ -815,8 +815,7 @@ bool IWearLogger::impl::loadSettingsFromConfig(yarp::os::Searchable& config)
         setLoggerLevel(option);
     }
 
-    yInfo() << logPrefix << "Actual logger level : " << int(this->loggerLevel);
-
+    // Display the current logger level
     switch (this->loggerLevel) {
     case LoggerLevel::MATLAB:
     {
