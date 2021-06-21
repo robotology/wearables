@@ -25,8 +25,19 @@ constexpr double DefaultPeriod = 0.01;
 namespace wearable {
     namespace wrappers {
         struct IWearLoggerSettings;
+
+        enum class LoggerLevel
+        {
+            MATLAB = 0,
+            YARP,
+            MATLAB_YARP,
+        };
     }
 } // namespace wearable
+
+
+
+
 struct wearable::wrappers::IWearLoggerSettings
 {
     bool saveBufferManagerConfiguration{false};
@@ -56,6 +67,10 @@ using namespace wearable::wrappers;
 class IWearLogger::impl
 {
 public:
+
+    LoggerLevel loggerLevel;
+    void setLoggerLevel(std::string& str);
+
     bool loadSettingsFromConfig(yarp::os::Searchable& config);
     void checkAndLoadBooleanOption(yarp::os::Property& prop,
                                    const std::string& optionName,
@@ -544,8 +559,52 @@ bool IWearLogger::open(yarp::os::Searchable& config)
     return true;
 }
 
+void IWearLogger::impl::setLoggerLevel(std::string& str)
+{
+    if (!std::strcmp(str.c_str(), "matlab"))
+    {
+        this->loggerLevel = LoggerLevel::MATLAB;
+        yInfo() << logPrefix << "LoggerLevel set to MATLAB";
+    }
+
+    if (!std::strcmp(str.c_str(), "yarp") && this->loggerLevel == LoggerLevel::MATLAB)
+    {
+        this->loggerLevel = LoggerLevel::MATLAB_YARP;
+        yInfo() << logPrefix << "LoggerLevel set to MATLAB & YARP";
+    }
+    else
+    {
+        this->loggerLevel = LoggerLevel::YARP;
+        yInfo() << logPrefix << "LoggerLevel set to YARP";
+    }
+}
+
 bool IWearLogger::impl::loadSettingsFromConfig(yarp::os::Searchable& config)
 {
+    // Check for logLevel parameter
+    if (! ( config.check("LoggerLevel") && (config.find("LoggerLevel").isString() || config.find("LoggerLevel").isList() ) ) )
+    {
+        yInfo() << logPrefix << "Using default LoggerLevel : MATLAB";
+        this->loggerLevel = LoggerLevel::MATLAB;
+    }
+    else if (config.check("LoggerLevel") && config.find("LoggerLevel").isList())
+    {
+        yarp::os::Bottle* loggerLevelList = config.find("LoggerLevel").asList();
+
+        for (size_t i = 0; i < loggerLevelList->size(); i++)
+        {
+            std::string option = loggerLevelList->get(i).asString();
+
+            setLoggerLevel(option);
+        }
+    }
+    else if (config.check("LoggerLevel") && config.find("LoggerLevel").isString())
+    {
+        std::string option = config.find("LoggerLevel").asString();
+
+        setLoggerLevel(option);
+    }
+
     yarp::os::Property prop;
     prop.fromString(config.toString().c_str());
 
