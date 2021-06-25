@@ -1234,6 +1234,10 @@ bool IWearLogger::impl::configureBufferManager()
             if (loggerLevel == LoggerLevel::MATLAB || loggerLevel == LoggerLevel::MATLAB_YARP) {
                 ok = ok && configureMatlabBufferManager(sensorName, 4);
             }
+
+            if (loggerLevel == LoggerLevel::YARP || loggerLevel == LoggerLevel::MATLAB_YARP) {
+                ok = ok && configureYarpBufferManager(sensorName);
+            }
         }
     }
 
