@@ -12,6 +12,8 @@
 
 #include <yarp/os/BufferedPort.h>
 #include <yarp/os/RpcServer.h>
+#include <yarp/os/TypedReaderCallback.h>
+
 
 #include <mutex>
 #include <string>
@@ -30,6 +32,8 @@ double period = 0.01;
 
 using namespace wearable;
 using namespace wearable::devices;
+
+using YarpBufferedPort = yarp::os::BufferedPort<yarp::os::Bottle>;
 
 const std::string EOL = "\n"; //EOL character
 const int MAX_LINE_LENGTH = 5000; // Maximum line length to read from serial port
@@ -97,6 +101,50 @@ public:
     class PaexoMotorActuator;
     ElementPtr<PaexoMotorActuator> paexoLeftMotorActuator;
     ElementPtr<PaexoMotorActuator> paexoRightMotorActuator;
+
+    // Motor actuator yarp port control
+    class PaexoMotorControlPort;
+    std::unique_ptr<PaexoMotorControlPort> paexoLeftMotorControlPort;
+    std::unique_ptr<PaexoMotorControlPort> paexoRightMotorControlPort;
+
+    // Helper function to split wearable element name
+    // TODO: To be moved to wearables utilities
+    inline std::vector<std::string> split(const std::string& s, const std::string& delimiter)
+    {
+        std::size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+        std::string token;
+        std::vector<std::string> res;
+
+        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+            token = s.substr(pos_start, pos_end - pos_start);
+            pos_start = pos_end + delim_len;
+            res.push_back(token);
+        }
+
+        res.push_back(s.substr(pos_start));
+        return res;
+    }
+
+    inline std::string getValidYarpName(const std::string& actuatorName)
+    {
+        std::string portName;
+
+        // Get valid port name from actuator name
+        auto vecStr = split(actuatorName, wearable::Separator);
+
+        for (auto& str : vecStr) {
+            if (portName.empty()) {
+                portName = str;
+            }
+            else {
+                portName = portName + '/' + str;
+            }
+        }
+
+        portName = "/" + portName + ":i";
+
+        return portName;
+    }
 
     // Number of sensors
     const int nSensors = 3; // Hardcoded for Paexo
@@ -187,6 +235,29 @@ Paexo::Paexo()
 
 // Destructor
 Paexo::~Paexo() = default;
+
+class Paexo::PaexoImpl::PaexoMotorControlPort : public YarpBufferedPort
+{
+public:
+
+    std::string portName;
+    ElementPtr<Paexo::PaexoImpl::PaexoMotorActuator> paexoMotorActuator = nullptr;
+
+    void onRead(yarp::os::Bottle& motorCommand) override;
+
+    // Constructor
+    PaexoMotorControlPort(const std::string& name, ElementPtr<Paexo::PaexoImpl::PaexoMotorActuator>& actuator)
+    {
+        portName = name;
+        // Set the actutor
+        if (actuator == nullptr)
+        {
+            yError() << LogPrefix << "Actuator passing error for motor control port " << portName;
+        }
+
+        paexoMotorActuator = actuator;
+    }
+};
 
 bool Paexo::open(yarp::os::Searchable& config)
 {
@@ -349,10 +420,46 @@ bool Paexo::open(yarp::os::Searchable& config)
 
     // Initialize wearable actuators for left and right motor
     pImpl->motorActuatorPrefix = getWearableName() + actuator::IMotor::getPrefix();
-    pImpl->paexoLeftMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
-                                                                                                                         pImpl->motorActuatorPrefix + "Left" + pImpl->motorActuatorName)};
-    pImpl->paexoRightMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
-                                                                                                                         pImpl->motorActuatorPrefix + "Right" + pImpl->motorActuatorName)};
+    const std::string leftActuatorName = pImpl->motorActuatorPrefix + "Left" + pImpl->motorActuatorName;
+    pImpl->paexoLeftMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(), leftActuatorName)};
+
+    const std::string rightActuatorName = pImpl->motorActuatorPrefix + "Right" + pImpl->motorActuatorName;
+    pImpl->paexoRightMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(), rightActuatorName)};
+
+    // Initialize yarp control ports
+
+    // Check yarp network initialization
+    if (!yarp::os::Network::isNetworkInitialized()) {
+        yInfo() << LogPrefix << "Initializing yarp network";
+        yarp::os::Network();
+    }
+
+    yInfo() << LogPrefix << "Initiailizeing PaexoMotorControlPort for " << leftActuatorName;
+
+    const std::string leftActatorName = pImpl->getValidYarpName(leftActuatorName);
+    pImpl->paexoLeftMotorControlPort = std::make_unique<PaexoImpl::PaexoMotorControlPort>(leftActuatorName, pImpl->paexoLeftMotorActuator);
+    pImpl->paexoLeftMotorControlPort->useCallback();
+
+
+    if (!pImpl->paexoLeftMotorControlPort->open(leftActatorName))
+    {
+        yError() << LogPrefix << "Failed to open paexo motor control port " << leftActatorName;
+        return false;
+    }
+
+    yInfo() << LogPrefix << "Initiailizeing PaexoMotorControlPort for " << rightActuatorName;
+
+    const std::string rightActatorName = pImpl->getValidYarpName(rightActuatorName);
+    pImpl->paexoRightMotorControlPort = std::make_unique<PaexoImpl::PaexoMotorControlPort>(rightActuatorName, pImpl->paexoRightMotorActuator);
+    pImpl->paexoRightMotorControlPort->useCallback();
+
+
+    if (!pImpl->paexoRightMotorControlPort->open(rightActatorName))
+    {
+        yError() << LogPrefix << "Failed to open paexo motor control port " << rightActatorName;
+        return false;
+    }
+
 
     // Initialize paexo data buffer
     pImpl->paexoData.angle    = 0.0;
@@ -589,11 +696,23 @@ public:
 
         // Set the commanded value to the serial write
         // TODO: Check for serial write failure
+        paexoImpl->iSerialDevice->flush();
         paexoImpl->iSerialDevice->send(c, motorCommand.length());
 
         return true;
     }
 };
+
+void Paexo::PaexoImpl::PaexoMotorControlPort::onRead(yarp::os::Bottle& motorCommand)
+{
+    // TODO: Check if mutex is needed
+    // NOTE: Assuming the associated port received a vector of one double as motor command
+    assert(paexoMotorActuator != nullptr);
+    yInfo() << LogPrefix << "Data received on " << portName << motorCommand.toString().c_str();
+
+    double cmd = motorCommand.get(0).asDouble();
+    paexoMotorActuator.get()->setMotorPosition(cmd);
+}
 
 void Paexo::run()
 {
