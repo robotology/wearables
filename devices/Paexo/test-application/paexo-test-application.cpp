@@ -23,6 +23,8 @@ int main() {
     std::string inPort = "/Paexo/WearableActuatorsCommand/input:i";
     std::string outPort = "/Paexo/WearableActuatorsCommand/output:o";
 
+    std::vector<std::string> PaexoActuators = {"Paexo::motor::LeftMotor", "Paexo::motor::RightMotor"};
+
     if (!yarp::os::Network::exists(inPort))
     {
         yError() << "Port " << inPort << " does not exists";
@@ -44,23 +46,26 @@ int main() {
 
     while (true) {
 
-        wearable::msg::WearableActuatorCommand& wearableActuatorCommand = port.prepare();
+        for (const auto& actuator : PaexoActuators)
+        {
+            wearable::msg::WearableActuatorCommand& wearableActuatorCommand = port.prepare();
 
-        // Add wearable actuator command
-        wearableActuatorCommand.info.name = "Paexo::motor::Actuator";
-        wearableActuatorCommand.info.type = wearable::msg::ActuatorType::MOTOR;
-        wearableActuatorCommand.info.status = wearable::msg::ActuatorStatus::OK;
+            // Add wearable actuator command
+            wearableActuatorCommand.info.name = actuator;
+            wearableActuatorCommand.info.type = wearable::msg::ActuatorType::MOTOR;
+            wearableActuatorCommand.info.status = wearable::msg::ActuatorStatus::OK;
 
-        wearableActuatorCommand.duration = 10;
-        wearableActuatorCommand.value = 40;
+            wearableActuatorCommand.duration = 10;
+            wearableActuatorCommand.value = 40;
 
-        yInfo() << "Command " << wearableActuatorCommand.info.name << " to position "
-                <<  wearableActuatorCommand.value << " deg";
+            yInfo() << "Command " << wearableActuatorCommand.info.name << " to position "
+                    <<  wearableActuatorCommand.value << " deg";
 
-        // Send the actuator command to the output port
-        port.write();
+            // Send the actuator command to the output port
+            port.write(true);
 
-        Time::delay(2);
+            Time::delay(2);
+        }
     }
 
     return 0;

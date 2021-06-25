@@ -93,9 +93,10 @@ public:
 
     // Motor Actuator
     std::string motorActuatorPrefix;
-    const std::string motorActuatorName = "Actuator";
+    const std::string motorActuatorName = "Motor";
     class PaexoMotorActuator;
-    ElementPtr<PaexoMotorActuator> paexoMotorActuator;
+    ElementPtr<PaexoMotorActuator> paexoLeftMotorActuator;
+    ElementPtr<PaexoMotorActuator> paexoRightMotorActuator;
 
     // Number of sensors
     const int nSensors = 3; // Hardcoded for Paexo
@@ -346,10 +347,12 @@ bool Paexo::open(yarp::os::Searchable& config)
                                                                                                                                         pImpl->ftSensorPrefix + "Right" + pImpl->ftSensorName)};
 #endif
 
-    // Initialize wearable actuators
+    // Initialize wearable actuators for left and right motor
     pImpl->motorActuatorPrefix = getWearableName() + actuator::IMotor::getPrefix();
-    pImpl->paexoMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
-                                                                                                                         pImpl->motorActuatorPrefix + pImpl->motorActuatorName)};
+    pImpl->paexoLeftMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
+                                                                                                                         pImpl->motorActuatorPrefix + "Left" + pImpl->motorActuatorName)};
+    pImpl->paexoRightMotorActuator = ElementPtr<PaexoImpl::PaexoMotorActuator>{std::make_shared<PaexoImpl::PaexoMotorActuator>(pImpl.get(),
+                                                                                                                         pImpl->motorActuatorPrefix + "Right" + pImpl->motorActuatorName)};
 
     // Initialize paexo data buffer
     pImpl->paexoData.angle    = 0.0;
@@ -552,7 +555,6 @@ public:
 // =======================================
 // Paexo implementation of Motor actutator
 // =======================================
-//TODO: Check if the paexo needs left and right actuators
 class Paexo::PaexoImpl::PaexoMotorActuator : public wearable::actuator::IMotor
 {
 public:
@@ -570,7 +572,18 @@ public:
     bool setMotorPosition(double& value) const override
     {
         // Prepare the move command
-        std::string motorCommand = "move::" + std::to_string(value);
+        std::string motorCommand = {};
+
+        if (this->getActuatorName().find("Left") != std::string::npos)
+        {
+            motorCommand = "move:l:" + std::to_string(value);
+        }
+
+        if (this->getActuatorName().find("Right") != std::string::npos)
+        {
+            motorCommand = "move:r:" + std::to_string(value);
+        }
+
         char c[motorCommand.length() + 1];
         std::strcpy(c, motorCommand.c_str());
 
@@ -822,7 +835,8 @@ Paexo::getActuators(const wearable::actuator::ActuatorType aType) const
 
     switch (aType) {
         case wearable::actuator::ActuatorType::Motor: {
-            outVec.push_back(static_cast<ElementPtr<actuator::IActuator>>(pImpl->paexoMotorActuator));
+            outVec.push_back(static_cast<ElementPtr<actuator::IActuator>>(pImpl->paexoLeftMotorActuator));
+            outVec.push_back(static_cast<ElementPtr<actuator::IActuator>>(pImpl->paexoRightMotorActuator));
             break;
         }
         default: {
@@ -927,7 +941,9 @@ Paexo::getMotorActuator(const actuator::ActuatorName name) const
         return nullptr;
     }
 
-    // Return a shared point to the required sensor
+    // Return a shared point to the required actuator
     return dynamic_cast<wearable::ElementPtr<const wearable::actuator::IMotor>&>(
-        *pImpl->paexoMotorActuator);
+        *pImpl->paexoLeftMotorActuator);
+    return dynamic_cast<wearable::ElementPtr<const wearable::actuator::IMotor>&>(
+        *pImpl->paexoRightMotorActuator);
 }
