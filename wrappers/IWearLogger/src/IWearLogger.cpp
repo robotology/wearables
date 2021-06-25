@@ -16,6 +16,7 @@
 #include <yarp/dev/PreciselyTimed.h>
 #include <yarp/os/LogStream.h>
 #include <yarp/os/Network.h>
+#include <yarp/sig/Vector.h>
 #include <yarp/os/BufferedPort.h>
 
 #include <yarp/telemetry/experimental/BufferManager.h>
@@ -67,6 +68,10 @@ struct wearable::wrappers::IWearLoggerSettings
 using namespace wearable;
 using namespace wearable::wrappers;
 
+using WerableSensorName = std::string;
+using MatlabChannelName = std::string;
+using YarpBufferedPort = yarp::os::BufferedPort<yarp::sig::Vector>;
+
 class IWearLogger::impl
 {
 public:
@@ -83,11 +88,13 @@ public:
     bool configureYarpBufferManager(const std::string& sensorName);
     bool configureBufferManager();
 
-    inline void prepareYarpBottle(yarp::os::Bottle& b, const std::vector<double>& data)
+    inline void prepareYarpBottle(const std::vector<double>& sensorData, yarp::sig::Vector& b)
     {
-        for (auto& e : data)
+        b.clear();
+
+        for (const auto& e : sensorData)
         {
-            b.addDouble(e);
+            b.push_back(e);
         }
     }
 
@@ -107,8 +114,10 @@ public:
         return res;
     }
 
-    inline std::string getValidName(std::string& name, const char& c)
+    inline std::string getValidName(const std::string& sensorName, const char& c)
     {
+        std::string name{sensorName};
+
         // Replace special characters with desired char c
         std::replace(name.begin(), name.end(), '#', c);
         std::replace(name.begin(), name.end(), '@', c);
@@ -133,16 +142,12 @@ public:
 
     inline std::string convertSensorNameToValidMatlabVarName(const std::string& sensorName)
     {
-        std::string matlabName{sensorName};
-
-        return getValidName(matlabName, '_');
+        return getValidName(sensorName, '_');
     }
 
     inline std::string convertSensorNameToValidYarpPortName(const std::string& sensorName)
     {
-        std::string yarpPortName{sensorName};
-
-        return ( '/' + getValidName(yarpPortName, '/') );
+        return ( '/' + getValidName(sensorName, '/') );
     }
 
     inline void
@@ -184,8 +189,8 @@ public:
     wearable::VectorOfSensorPtr<const wearable::sensor::IVirtualSphericalJointKinSensor>
         virtualSphericalJointKinSensors;
 
-    std::unordered_map<std::string, std::string> wearable2MatlabNameLookup;
-    std::unordered_map<std::string, std::unique_ptr<yarp::os::BufferedPort<yarp::os::Bottle>>> wearable2YarpPortLookup;
+    std::unordered_map<WerableSensorName, MatlabChannelName> wearable2MatlabNameLookup;
+    std::unordered_map<WerableSensorName, std::unique_ptr<YarpBufferedPort>> wearable2YarpPortLookup;
 };
 
 IWearLogger::IWearLogger()
@@ -284,8 +289,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -317,8 +322,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -346,8 +351,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -376,8 +381,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -406,8 +411,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -436,8 +441,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -466,8 +471,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -496,8 +501,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -529,8 +534,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -559,8 +564,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -590,8 +595,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -620,8 +625,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -663,8 +668,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -700,8 +705,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -736,8 +741,8 @@ void IWearLogger::run()
                 if (pImpl->loggerLevel == LoggerLevel::YARP || pImpl->loggerLevel == LoggerLevel::MATLAB_YARP)
                 {
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
-                    yarp::os::Bottle& data = port->prepare();
-                    pImpl->prepareYarpBottle(data, saveVar);
+                    yarp::sig::Vector& data = port->prepare();
+                    pImpl->prepareYarpBottle(saveVar,  data);
                     port->write(true);
                 }
             }
@@ -985,7 +990,7 @@ bool IWearLogger::attach(yarp::dev::PolyDriver* poly)
 
 bool IWearLogger::impl::configureMatlabBufferManager(const std::string& sensorName, const size_t& channelSize)
 {
-    auto channelName = convertSensorNameToValidMatlabVarName(sensorName);
+    MatlabChannelName channelName = convertSensorNameToValidMatlabVarName(sensorName);
     wearable2MatlabNameLookup[sensorName] = channelName;
 
     bool ok = bufferManager.addChannel({channelName, {channelSize, 1}});
@@ -1003,7 +1008,7 @@ bool IWearLogger::impl::configureYarpBufferManager(const std::string &sensorName
 {
     auto portName = convertSensorNameToValidYarpPortName(sensorName);
 
-    std::unique_ptr<yarp::os::BufferedPort<yarp::os::Bottle>> port = std::make_unique<yarp::os::BufferedPort<yarp::os::Bottle>>();
+    auto port = std::make_unique<YarpBufferedPort>();
 
     // Check yarp network initialization
     if (!yarp::os::Network::isNetworkInitialized())
