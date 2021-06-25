@@ -287,6 +287,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -320,6 +321,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -349,6 +351,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -379,6 +382,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -409,6 +413,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -439,6 +444,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -469,6 +475,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -499,6 +506,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -532,6 +540,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -562,6 +571,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -593,6 +603,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -623,6 +634,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -666,6 +678,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -703,6 +716,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
@@ -739,6 +753,7 @@ void IWearLogger::run()
                     auto& port = pImpl->wearable2YarpPortLookup.at(sensor->getSensorName());
                     yarp::sig::Vector& data = port->prepare();
                     pImpl->prepareYarpBottle(saveVar, data);
+                    port->setEnvelope(timestamp);
                     port->write(true);
                 }
             }
