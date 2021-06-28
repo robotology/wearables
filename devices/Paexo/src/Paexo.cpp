@@ -434,7 +434,7 @@ bool Paexo::open(yarp::os::Searchable& config)
         yarp::os::Network();
     }
 
-    yInfo() << LogPrefix << "Initiailizeing PaexoMotorControlPort for " << leftActuatorName;
+    yInfo() << LogPrefix << "Initiailizing PaexoMotorControlPort for " << leftActuatorName;
 
     const std::string leftActatorName = pImpl->getValidYarpName(leftActuatorName);
     pImpl->paexoLeftMotorControlPort = std::make_unique<PaexoImpl::PaexoMotorControlPort>(leftActuatorName, pImpl->paexoLeftMotorActuator);
@@ -447,7 +447,7 @@ bool Paexo::open(yarp::os::Searchable& config)
         return false;
     }
 
-    yInfo() << LogPrefix << "Initiailizeing PaexoMotorControlPort for " << rightActuatorName;
+    yInfo() << LogPrefix << "Initiailizing PaexoMotorControlPort for " << rightActuatorName;
 
     const std::string rightActatorName = pImpl->getValidYarpName(rightActuatorName);
     pImpl->paexoRightMotorControlPort = std::make_unique<PaexoImpl::PaexoMotorControlPort>(rightActuatorName, pImpl->paexoRightMotorActuator);
@@ -691,6 +691,8 @@ public:
             motorCommand = "move:r:" + std::to_string(value);
         }
 
+        motorCommand += EOL;
+
         char c[motorCommand.length() + 1];
         std::strcpy(c, motorCommand.c_str());
 
@@ -708,7 +710,7 @@ void Paexo::PaexoImpl::PaexoMotorControlPort::onRead(yarp::os::Bottle& motorComm
     // TODO: Check if mutex is needed
     // NOTE: Assuming the associated port received a vector of one double as motor command
     assert(paexoMotorActuator != nullptr);
-    yInfo() << LogPrefix << "Data received on " << portName << motorCommand.toString().c_str();
+    //yInfo() << LogPrefix << "Data received on " << portName << motorCommand.toString().c_str();
 
     double cmd = motorCommand.get(0).asDouble();
     paexoMotorActuator.get()->setMotorPosition(cmd);
@@ -758,7 +760,7 @@ void Paexo::run()
 
         }
         else if(!isdigit(msg[0])) {
-            yInfo() << LogPrefix << msg;
+            //yInfo() << LogPrefix << msg;
         }
     }
 
