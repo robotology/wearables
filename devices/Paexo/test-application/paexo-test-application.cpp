@@ -15,9 +15,9 @@
 
 #include <thrift/WearableActuatorCommand.h>
 
-#define MIN_MOTOR_POSITION 27
-#define MAX_MOTOR_POSITION 55
-#define MOTOR_STEP_SIZE 0.5 //Could go as low as 0.2
+#define MIN_MOTOR_POSITION 30
+#define MAX_MOTOR_POSITION 50
+#define MOTOR_STEP_SIZE 2 //Could go as low as 0.2
 using namespace yarp::os;
 using namespace wearable;
 using YarpBufferedPort = yarp::os::BufferedPort<yarp::os::Bottle>;
@@ -112,7 +112,7 @@ int main() {
 
                 port->write(true);
 
-                Time::delay(0.1);
+                Time::delay(0.5);
 
                 current_motor_position += MOTOR_STEP_SIZE;
             }
