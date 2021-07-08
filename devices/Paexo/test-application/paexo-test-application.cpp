@@ -34,25 +34,6 @@ int main() {
     std::vector<std::string> PaexoActuatorPortNames = {"/Paexo/motor/LeftMotor"};
     std::vector<std::unique_ptr<YarpBufferedPort>> PaexoActuatorPorts;
 
-//    if (!yarp::os::Network::exists(inPort))
-//    {
-//        yError() << "Port " << inPort << " does not exists";
-//        return -1;
-//    }
-
-//    BufferedPort<wearable::msg::WearableActuatorCommand> port;
-//    if(!port.open(outPort))
-//    {
-//        yError() << "Failed to open port " << outPort;
-//        return -1;
-//    }
-
-//    if (!yarp::os::Network::connect(outPort,inPort))
-//    {
-//        yError() << "Failed to connect " << outPort << " to " << inPort;
-//        return -1;
-//    }
-
     // Yarp buffered ports for motor control
     for (const auto& portName : PaexoActuatorPortNames)
     {
@@ -75,27 +56,6 @@ int main() {
 
 
     while (true) {
-
-//        for (const auto& actuator : PaexoActuators)
-//        {
-//            wearable::msg::WearableActuatorCommand& wearableActuatorCommand = port.prepare();
-
-//            // Add wearable actuator command
-//            wearableActuatorCommand.info.name = actuator;
-//            wearableActuatorCommand.info.type = wearable::msg::ActuatorType::MOTOR;
-//            wearableActuatorCommand.info.status = wearable::msg::ActuatorStatus::OK;
-
-//            wearableActuatorCommand.duration = 10;
-//            wearableActuatorCommand.value = 40;
-
-//            yInfo() << "Command " << wearableActuatorCommand.info.name << " to position "
-//                    <<  wearableActuatorCommand.value << " deg";
-
-//            // Send the actuator command to the output port
-//            port.write(true);
-
-//            Time::delay(2);
-//        }
 
         for (const auto& port : PaexoActuatorPorts)
         {
