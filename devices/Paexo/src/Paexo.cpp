@@ -47,6 +47,9 @@ struct PaexoData
 class Paexo::PaexoImpl
 {
 public:
+
+    yarp::os::Network network;
+
     mutable std::mutex mutex;
     yarp::dev::ISerialDevice* iSerialDevice = nullptr;
 
@@ -439,9 +442,10 @@ bool Paexo::open(yarp::os::Searchable& config)
     // Initialize yarp control ports
 
     // Check yarp network initialization
-    if (!yarp::os::Network::isNetworkInitialized()) {
-        yInfo() << LogPrefix << "Initializing yarp network";
-        yarp::os::Network();
+    pImpl->network = yarp::os::Network();
+    if (!yarp::os::Network::initialized() || !yarp::os::Network::checkNetwork(5.0)) {
+        yError() << LogPrefix << "YARP server wasn't found active.";
+        return false;
     }
 
     yInfo() << LogPrefix << "Initiailizing PaexoMotorControlPort for " << leftActuatorName;
