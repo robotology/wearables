@@ -805,37 +805,37 @@ bool IWearLogger::impl::loadSettingsFromConfig(yarp::os::Searchable& config)
 {
     // Check for logLevel parameter
     this->loggerType = LoggerType::NONE;
-    if (!(config.check("LoggerLevel")
-          && (config.find("LoggerLevel").isString() || config.find("LoggerLevel").isList()))) {
-        yInfo() << logPrefix << "Using default LoggerLevel : MATLAB";
+    if (!(config.check("LoggerType")
+          && (config.find("LoggerType").isString() || config.find("LoggerType").isList()))) {
+        yInfo() << logPrefix << "Using default LoggerType : MATLAB";
         this->loggerType = LoggerType::MATLAB;
     }
-    else if (config.check("LoggerLevel") && config.find("LoggerLevel").isList()) {
-        yarp::os::Bottle* loggerLevelList = config.find("LoggerLevel").asList();
+    else if (config.check("LoggerType") && config.find("LoggerType").isList()) {
+        yarp::os::Bottle* loggerTypeList = config.find("LoggerType").asList();
 
-        for (size_t i = 0; i < loggerLevelList->size(); i++) {
-            std::string option = loggerLevelList->get(i).asString();
+        for (size_t i = 0; i < loggerTypeList->size(); i++) {
+            std::string option = loggerTypeList->get(i).asString();
 
             setLoggerType(option);
         }
     }
-    else if (config.check("LoggerLevel") && config.find("LoggerLevel").isString()) {
-        std::string option = config.find("LoggerLevel").asString();
+    else if (config.check("LoggerType") && config.find("LoggerType").isString()) {
+        std::string option = config.find("LoggerType").asString();
         setLoggerType(option);
     }
 
     // Display the current logger level
     switch (this->loggerType) {
         case LoggerType::MATLAB: {
-            yInfo() << logPrefix << "LoggerLevel set to MATLAB";
+            yInfo() << logPrefix << "LoggerType set to MATLAB";
             break;
         }
         case LoggerType::YARP: {
-            yInfo() << logPrefix << "LoggerLevel set to YARP";
+            yInfo() << logPrefix << "LoggerType set to YARP";
             break;
         }
         case LoggerType::MATLAB_YARP: {
-            yInfo() << logPrefix << "LoggerLevel set to MATLAB & YARP";
+            yInfo() << logPrefix << "LoggerType set to MATLAB & YARP";
             break;
         }
         default:
