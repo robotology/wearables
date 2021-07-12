@@ -16,6 +16,7 @@
 
 #include <assert.h>
 #include <mutex>
+#include <stdexcept>
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -47,7 +48,6 @@ struct PaexoData
 class Paexo::PaexoImpl
 {
 public:
-
     yarp::os::Network network;
 
     mutable std::mutex mutex;
@@ -251,7 +251,8 @@ public:
         portName = name;
         // Set the actutor
         if (actuator == nullptr) {
-            yError() << LogPrefix << "Actuator passing error for motor control port " << portName;
+            throw std::runtime_error(LogPrefix + "Actuator passing error for motor control port "
+                                     + portName);
         }
 
         paexoMotorActuator = actuator;
