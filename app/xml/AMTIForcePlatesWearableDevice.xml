@@ -7,7 +7,7 @@
 	<param name="genlock"> off </param>
 	<param name="dataFormat"> data </param>
     </device>
-	
+
     <device name="first_plaftform" type="amtiforceplate">
         <param name="platformID"> 2897 </param>
 	<param name="platformZRotation"> 90 </param> <!-- Degree of rotation around z-axis -->
@@ -19,7 +19,7 @@
 
         <action phase="shutdown" level="5" type="detach" />
     </device>
-	
+
     <device name="second_plaftform" type="amtiforceplate">
         <param name="platformID"> 2896 </param>
 	<param name="platformZRotation"> 270 </param> <!-- Degree of rotation around z-axis -->
@@ -30,7 +30,7 @@
         </action>
         <action phase="shutdown" level="5" type="detach" />
     </device>
-	
+
     <device name="first_platform_wrapper" type="analogServer">
 	<param name="period"> 10 </param>
 	<param name="name"> /amti/first/analog:o </param>
@@ -41,7 +41,7 @@
 	</action>
 	<action phase="shutdown" level="10" type="detach" />
     </device>
-	
+
     <device name="second_platform_wrapper" type="analogServer">
 	<param name="period"> 10 </param>
 	<param name="name"> /amti/second/analog:o </param>
@@ -83,7 +83,7 @@
     <action phase="shutdown" level="5" type="detach"/>
     </device>
 
-    
+
     <device type="iwear_wrapper" name="FTShoeRightIWearWrapper">
     <param name="period">0.01</param>
     <param name="dataPortName">/FTShoeRight/WearableData/data:o</param>
@@ -108,5 +108,80 @@
     <action phase="shutdown" level="5" type="detach"/>
     </device>
 
-  
-</robot> 
+    <device type="iwear_logger" name="ProducerLoggerDeviceAMTIFirst">
+        <param name="period">0.01</param>
+        <param name="LoggerType">(yarp)</param>
+        <param name="logAllQuantities">true</param>
+        <param name="logAccelerometers">false</param>
+        <param name="logEMGSensors">false</param>
+        <param name="logForce3DSensors">false</param>
+        <param name="logForceTorque6DSensors">true</param>
+        <param name="logFreeBodyAccelerationSensors">true</param>
+        <param name="logGyroscopes">true</param>
+        <param name="logMagnetometers">false</param>
+        <param name="logOrientationSensors">true</param>
+        <param name="logPoseSensors">false</param>
+        <param name="logPositionSensors">false</param>
+        <param name="logTemperatureSensors">false</param>
+        <param name="logTorque3DSensors">false</param>
+        <param name="logVirtualLinkKinSensors">false</param>
+        <param name="logVirtualJointKinSensors">false</param>
+        <param name="logVirtualSphericalJointKinSensors">false</param>
+
+        <param name="saveBufferManagerConfiguration">true</param>
+        <param name="experimentName">test_iwear_logger</param>
+        <param name="path">/path/to/some/folder/</param>
+        <param name="n_samples">100000</param>
+        <param name="save_periodically">true</param>
+        <param name="save_period">120.0</param>
+        <param name="data_threshold">300</param>
+        <param name="auto_save">true</param>
+
+        <action phase="startup" level="5" type="attach">
+            <paramlist name="networks">
+                <elem name="ProducerDeviceWrapperLabel"> AMTIFirstPlatformtIAnalogSensorToIWear </elem>
+            </paramlist>
+        </action>
+        <action phase="shutdown" level="5" type="detach"/>
+    </device>
+
+
+    <device type="iwear_logger" name="ProducerLoggerDeviceAMTISecond">
+        <param name="period">0.01</param>
+        <param name="LoggerType">(yarp)</param>
+        <param name="logAllQuantities">true</param>
+        <param name="logAccelerometers">false</param>
+        <param name="logEMGSensors">false</param>
+        <param name="logForce3DSensors">false</param>
+        <param name="logForceTorque6DSensors">true</param>
+        <param name="logFreeBodyAccelerationSensors">true</param>
+        <param name="logGyroscopes">true</param>
+        <param name="logMagnetometers">false</param>
+        <param name="logOrientationSensors">true</param>
+        <param name="logPoseSensors">false</param>
+        <param name="logPositionSensors">false</param>
+        <param name="logTemperatureSensors">false</param>
+        <param name="logTorque3DSensors">false</param>
+        <param name="logVirtualLinkKinSensors">false</param>
+        <param name="logVirtualJointKinSensors">false</param>
+        <param name="logVirtualSphericalJointKinSensors">false</param>
+
+        <param name="saveBufferManagerConfiguration">true</param>
+        <param name="experimentName">test_iwear_logger</param>
+        <param name="path">/path/to/some/folder/</param>
+        <param name="n_samples">100000</param>
+        <param name="save_periodically">true</param>
+        <param name="save_period">120.0</param>
+        <param name="data_threshold">300</param>
+        <param name="auto_save">true</param>
+
+        <action phase="startup" level="5" type="attach">
+            <paramlist name="networks">
+                <elem name="ProducerDeviceWrapperLabel"> AMTISecondPlatformtIAnalogSensorToIWear </elem>
+            </paramlist>
+        </action>
+        <action phase="shutdown" level="5" type="detach"/>
+    </device>
+
+
+</robot>
