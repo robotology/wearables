@@ -423,7 +423,7 @@ void IWearWrapper::run()
     }
 
     // Stream the data though the port
-    pImpl->dataPort.write(true);
+    pImpl->dataPort.write();
 }
 
 // ======================
