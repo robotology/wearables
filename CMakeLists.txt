@@ -94,4 +94,12 @@ option(ENABLE_Paexo "Flag that enables building Paexo wearable device" OFF)
 option(ENABLE_HapticGlove "Flag that enables building Haptic Sense Glove wearable device" OFF)
 
 # Flag to enable IWearFrameVisualizer module
-option(ENABLE_FrameVisualizer "Flag that enables building IWearFrameVisualizer module" OFF)
+find_package(iDynTree QUIET)
+option(ENABLE_FrameVisualizer "Flag that enables building IWearFrameVisualizer module" ${iDynTree_FOUND})
+
+# Flag to enable IWearLogger device
+find_package(robometry QUIET)
+option(ENABLE_Logger "Flag that enables building Wearable Logger device" ${robometry_FOUND})
+
+# Flag to enable ICub wearable device
+option(ENABLE_ICub "Flag that enables building iCub wearable device" ${iDynTree_FOUND})
