@@ -14,6 +14,7 @@ It must be noted that `YARP`, together with a subset of the optional dependencie
 
 ### Optional
 * [robometry](https://github.com/robotology/robometry) device: if present, the `IWearLogger` is installed.
+* [iDynTree](https://github.com/robotology/idyntree): if present, the `IWearFrameVisualizer` is installed.
 
 ## Build the suite
 ### Linux/macOS
