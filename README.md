@@ -38,7 +38,7 @@ Note that this is not necessary if you install `wearables` via the `robotology-s
 The compilation of some of the software components in `wearables` can be enabled using the following cmake flags:
 - `ENABLE_FrameVisualizer`: enable the compilation of the `IWearFrameVisualizer` modeule that allows to visualize wearble inertial measurements.
 - `ENABLE_Logger`: enable the compilation of the `IWearLogger` device that allows to save wearable data as `.mat` or stream the data on YARP as analog vector data.
-- `ENABLE_<device>`: enable teh compilation of the optional wearable device (see documentation in [Wearable device sources](#wearable-device-sources)).
+- `ENABLE_<device>`: enable the compilation of the optional wearable device (see documentation in [Wearable device sources](#wearable-device-sources)).
 
 
 # Wearable device sources
