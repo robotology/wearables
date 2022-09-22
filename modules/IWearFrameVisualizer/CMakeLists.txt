@@ -19,7 +19,6 @@ endmacro()
 set(EXE_TARGET_NAME IWearFrameVisualizerModule)
 
 
-find_package(IWear REQUIRED)
 find_package(YARP REQUIRED)
 find_package(iDynTree REQUIRED)
 
