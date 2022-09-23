@@ -46,8 +46,6 @@ public:
     msg::WearableData wearableData;
     std::vector<std::unique_ptr<yarp::os::BufferedPort<msg::WearableData>>> inputPortsWearData;
 
-    std::map<wearable::sensor::SensorName, size_t> sensorNameToIndex;
-
     // Sensors stored for exposing wearable::IWear
     std::map<std::string, std::shared_ptr<sensor::impl::Accelerometer>> accelerometers;
     std::map<std::string, std::shared_ptr<sensor::impl::EmgSensor>> emgSensors;
