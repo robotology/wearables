@@ -695,6 +695,125 @@ SensorPtr<const sensor::ISensor> IWearRemapper::getSensor(const sensor::SensorNa
     return nullptr;
 }
 
+bool IWearRemapper::attachAll(const yarp::dev::PolyDriverList& driverList)
+{
+    for(int p=0; p<driverList.size(); p++)
+    {
+        wearable::IWear* iWear = nullptr;
+        if (!driverList[p]->poly->view(iWear)) {
+            yError() << logPrefix << "Failed to view the IWear interface from the PolyDriver.";
+            return false;
+        }
+
+        for (const auto& sensor : iWear->getAccelerometers()) {
+            const auto* constSensor = static_cast<const sensor::impl::Accelerometer*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::Accelerometer*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->accelerometers.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getEmgSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::EmgSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::EmgSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->emgSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getForce3DSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::Force3DSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::Force3DSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->force3DSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getForceTorque6DSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::ForceTorque6DSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::ForceTorque6DSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->forceTorque6DSensors.emplace(sensor->getSensorName(), newSensor);
+            std::cerr << "adding ft6d sensor: " << sensor->getSensorName() << std::endl;
+        }
+        for (const auto& sensor : iWear->getFreeBodyAccelerationSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::FreeBodyAccelerationSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::FreeBodyAccelerationSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->freeBodyAccelerationSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getGyroscopes()) {
+            const auto* constSensor = static_cast<const sensor::impl::Gyroscope*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::Gyroscope*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->gyroscopes.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getMagnetometers()) {
+            const auto* constSensor = static_cast<const sensor::impl::Magnetometer*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::Magnetometer*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->magnetometers.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getOrientationSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::OrientationSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::OrientationSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->orientationSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getPoseSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::PoseSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::PoseSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->poseSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getPositionSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::PositionSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::PositionSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->positionSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getSkinSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::SkinSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::SkinSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->skinSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getTemperatureSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::TemperatureSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::TemperatureSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->temperatureSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getTorque3DSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::Torque3DSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::Torque3DSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->torque3DSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getVirtualLinkKinSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::VirtualLinkKinSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::VirtualLinkKinSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->virtualLinkKinSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getVirtualJointKinSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::VirtualJointKinSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::VirtualJointKinSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->virtualJointKinSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+        for (const auto& sensor : iWear->getVirtualSphericalJointKinSensors()) {
+            const auto* constSensor = static_cast<const sensor::impl::VirtualSphericalJointKinSensor*>(sensor.get());
+            auto* newSensor = const_cast<sensor::impl::VirtualSphericalJointKinSensor*>(constSensor);
+            newSensor->setStatus(sensor->getSensorStatus());
+            pImpl->virtualSphericalJointKinSensors.emplace(sensor->getSensorName(), newSensor);
+        }
+
+    }
+
+    pImpl->firstRun = false;
+    return true;
+}
+
+bool IWearRemapper::detachAll()
+{
+    return true;
+}
+
 VectorOfSensorPtr<const sensor::ISensor>
 IWearRemapper::getSensors(const sensor::SensorType type) const
 {
