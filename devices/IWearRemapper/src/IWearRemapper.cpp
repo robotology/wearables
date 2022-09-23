@@ -39,6 +39,7 @@ public:
     TimeStamp timestamp;
     bool firstRun = true;
     bool terminationCall = false;
+    bool inputDataPorts = false;
 
     mutable std::recursive_mutex mutex;
 
@@ -89,82 +90,105 @@ IWearRemapper::~IWearRemapper() = default;
 
 bool IWearRemapper::open(yarp::os::Searchable& config)
 {
-    // ===============================
-    // CHECK THE CONFIGURATION OPTIONS
-    // ===============================
+    // =====================
+    // CHECK THE INPUT PORTS 
+    // =====================
 
-    // Data ports
-    if (!(config.check("wearableDataPorts") && config.find("wearableDataPorts").isList())) {
-        yError() << logPrefix << "wearableDataPorts option does not exist or it is not a list";
-        return false;
+
+    // Check if the wearableDataPorts is present
+    bool inputDataPortsConfigurationOption = config.check("wearableDataPorts");
+    yarp::os::Bottle* inputDataPortsNamesList;
+
+    if (!inputDataPortsConfigurationOption) {
+        // there are no input ports
+        pImpl->inputDataPorts = inputDataPortsConfigurationOption;
     }
-    yarp::os::Bottle* inputDataPortsNamesList = config.find("wearableDataPorts").asList();
-    for (unsigned i = 0; i < inputDataPortsNamesList->size(); ++i) {
-        if (!inputDataPortsNamesList->get(i).isString()) {
-            yError() << logPrefix << "ith entry of wearableDataPorts list is not a string";
+    else
+    {
+        // Check that wearableDataPorts option is a list
+        if (!config.find("wearableDataPorts").isList()) {
+            yError() << logPrefix << "wearableDataPorts option is not a list";
             return false;
+        }
+
+        inputDataPortsNamesList = config.find("wearableDataPorts").asList();
+        // If the list is not empty, parse the input ports
+        if (inputDataPortsNamesList->size() != 0) {
+            pImpl->inputDataPorts = true; 
+        }
+
+    }
+
+    if (pImpl->inputDataPorts) {
+
+        for (unsigned i = 0; i < inputDataPortsNamesList->size(); ++i) {
+            if (!inputDataPortsNamesList->get(i).isString()) {
+                yError() << logPrefix << "ith entry of wearableDataPorts list is not a string";
+                return false;
+            }
+        }
+
+        // ===============================
+        // PARSE THE CONFIGURATION OPTIONS
+        // ===============================
+
+        // Convert list to vector
+        std::vector<std::string> inputDataPortsNamesVector;
+        for (unsigned i = 0; i < inputDataPortsNamesList->size(); ++i) {
+            inputDataPortsNamesVector.emplace_back(inputDataPortsNamesList->get(i).asString());
+        }
+
+        yInfo() << logPrefix << "*** ========================";
+        for (unsigned i = 0; i < inputDataPortsNamesVector.size(); ++i) {
+            yInfo() << logPrefix << "*** Wearable Data Port" << i + 1 << "  :"
+                    << inputDataPortsNamesVector[i];
+        }
+
+        yInfo() << logPrefix << "*** ========================";
+
+        // Carrier optional configuration
+        std::string carrier = "";
+        if (config.check("carrier")) {
+            carrier = config.find("carrier").asString();
+        }
+
+        // ==========================
+        // CONFIGURE INPUT DATA PORTS
+        // ==========================
+        yDebug() << logPrefix << "Configuring input data ports";
+
+        for (unsigned i = 0; i < config.find("wearableDataPorts").asList()->size(); ++i) {
+            pImpl->inputPortsWearData.emplace_back(new yarp::os::BufferedPort<msg::WearableData>());
+            pImpl->inputPortsWearData.back()->useCallback(*this);
+
+            if (!pImpl->inputPortsWearData.back()->open("...")) {
+                yError() << logPrefix << "Failed to open local input port";
+                return false;
+            }
+        }
+
+        // ================
+        // OPEN INPUT PORTS
+        // ================
+        yDebug() << logPrefix << "Opening input ports";
+
+        for (unsigned i = 0; i < config.find("wearableDataPorts").asList()->size(); ++i) {
+            if (!yarp::os::Network::connect(inputDataPortsNamesVector[i],
+                                            pImpl->inputPortsWearData[i]->getName(),
+                                            carrier)) {
+                yError() << logPrefix << "Failed to connect " << inputDataPortsNamesVector[i]
+                        << " with " << pImpl->inputPortsWearData[i]->getName();
+                return false;
+            }
         }
     }
 
-    // ===============================
-    // PARSE THE CONFIGURATION OPTIONS
-    // ===============================
-
-    // Convert list to vector
-    std::vector<std::string> inputDataPortsNamesVector;
-    for (unsigned i = 0; i < inputDataPortsNamesList->size(); ++i) {
-        inputDataPortsNamesVector.emplace_back(inputDataPortsNamesList->get(i).asString());
-    }
-
-    yInfo() << logPrefix << "*** ========================";
-    for (unsigned i = 0; i < inputDataPortsNamesVector.size(); ++i) {
-        yInfo() << logPrefix << "*** Wearable Data Port" << i + 1 << "  :"
-                << inputDataPortsNamesVector[i];
-    }
-
-    yInfo() << logPrefix << "*** ========================";
-
-    // Carrier optional configuration
-    std::string carrier = "";
-    if (config.check("carrier")) {
-        carrier = config.find("carrier").asString();
-    }
 
     // Initialize the network
     pImpl->network = yarp::os::Network();
     if (!yarp::os::Network::initialized() || !yarp::os::Network::checkNetwork(5.0)) {
         yError() << logPrefix << "YARP server wasn't found active.";
         return false;
-    }
-
-    // ==========================
-    // CONFIGURE INPUT DATA PORTS
-    // ==========================
-    yDebug() << logPrefix << "Configuring input data ports";
-
-    for (unsigned i = 0; i < config.find("wearableDataPorts").asList()->size(); ++i) {
-        pImpl->inputPortsWearData.emplace_back(new yarp::os::BufferedPort<msg::WearableData>());
-        pImpl->inputPortsWearData.back()->useCallback(*this);
-
-        if (!pImpl->inputPortsWearData.back()->open("...")) {
-            yError() << logPrefix << "Failed to open local input port";
-            return false;
-        }
-    }
-
-    // ================
-    // OPEN INPUT PORTS
-    // ================
-    yDebug() << logPrefix << "Opening input ports";
-
-    for (unsigned i = 0; i < config.find("wearableDataPorts").asList()->size(); ++i) {
-        if (!yarp::os::Network::connect(inputDataPortsNamesVector[i],
-                                        pImpl->inputPortsWearData[i]->getName(),
-                                        carrier)) {
-            yError() << logPrefix << "Failed to connect " << inputDataPortsNamesVector[i]
-                     << " with " << pImpl->inputPortsWearData[i]->getName();
-            return false;
-        }
     }
 
     // We use callbacks on the input ports, the loop is a no-op
@@ -728,7 +752,6 @@ bool IWearRemapper::attachAll(const yarp::dev::PolyDriverList& driverList)
             auto* newSensor = const_cast<sensor::impl::ForceTorque6DSensor*>(constSensor);
             newSensor->setStatus(sensor->getSensorStatus());
             pImpl->forceTorque6DSensors.emplace(sensor->getSensorName(), newSensor);
-            std::cerr << "adding ft6d sensor: " << sensor->getSensorName() << std::endl;
         }
         for (const auto& sensor : iWear->getFreeBodyAccelerationSensors()) {
             const auto* constSensor = static_cast<const sensor::impl::FreeBodyAccelerationSensor*>(sensor.get());
@@ -805,7 +828,11 @@ bool IWearRemapper::attachAll(const yarp::dev::PolyDriverList& driverList)
 
     }
 
-    pImpl->firstRun = false;
+    // if there are not input ports there is no need to wait for the first data
+    if (!pImpl->inputDataPorts) {
+        pImpl->firstRun = false;
+    }
+
     return true;
 }
 
