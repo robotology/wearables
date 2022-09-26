@@ -40,6 +40,9 @@ public:
     bool firstRun = true;
     bool terminationCall = false;
     bool inputDataPorts = false;
+    
+    // Flag to wait for first data received
+    bool waitForAttachAll = false;
 
     mutable std::recursive_mutex mutex;
 
@@ -91,6 +94,15 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
     // =====================
     // CHECK THE INPUT PORTS 
     // =====================
+
+    // wait for attachAll
+    if (config.check("waitForAttachAll")) {
+        if (!config.find("waitForAttachAll").isBool()) {
+            yError() << logPrefix << "waitForAttachAll option is not a bool";
+            return false;
+        }
+        pImpl->waitForAttachAll = config.find("waitForAttachAll").asBool();
+    }
 
 
     // Check if the wearableDataPorts is present
@@ -179,18 +191,22 @@ bool IWearRemapper::open(yarp::os::Searchable& config)
                 return false;
             }
         }
+
+        // Initialize the network
+        pImpl->network = yarp::os::Network();
+        if (!yarp::os::Network::initialized() || !yarp::os::Network::checkNetwork(5.0)) {
+            yError() << logPrefix << "YARP server wasn't found active.";
+            return false;
+        }
+
+        // If it not necessary to wait for the attachAll start the callbacks
+        // We use callbacks on the input ports, the loop is a no-op
+        if (!pImpl->waitForAttachAll) {
+            start();
+        }
+    
     }
-
-
-    // Initialize the network
-    pImpl->network = yarp::os::Network();
-    if (!yarp::os::Network::initialized() || !yarp::os::Network::checkNetwork(5.0)) {
-        yError() << logPrefix << "YARP server wasn't found active.";
-        return false;
-    }
-
-    // We use callbacks on the input ports, the loop is a no-op
-    start();
+    
 
     yDebug() << logPrefix << "Opened correctly";
     return true;
@@ -826,9 +842,16 @@ bool IWearRemapper::attachAll(const yarp::dev::PolyDriverList& driverList)
 
     }
 
-    // if there are not input ports there is no need to wait for the first data
+    // If there are not input ports there is no need to wait for the first data and to start the no-op loop
     if (!pImpl->inputDataPorts) {
         pImpl->firstRun = false;
+        return true;
+    }
+    else {
+        // If it is wating for the attach all, the loop can now be started
+        if (pImpl->waitForAttachAll) {
+            start();
+        }
     }
 
     return true;
