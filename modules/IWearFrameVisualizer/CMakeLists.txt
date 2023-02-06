@@ -24,7 +24,7 @@ find_package(iDynTree REQUIRED)
 add_executable(${EXE_TARGET_NAME} src/main.cpp)
 
 target_link_libraries(${EXE_TARGET_NAME} PUBLIC
-    Wearables::IWear
+    IWear
     YARP::YARP_os
     YARP::YARP_sig
     YARP::YARP_dev
