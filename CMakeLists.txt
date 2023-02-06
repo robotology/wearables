@@ -83,7 +83,7 @@ option(ENABLE_HapticGlove "Flag that enables building Haptic Sense Glove wearabl
 
 # Flag to enable IWearFrameVisualizer module
 find_package(iDynTree QUIET)
-option(ENABLE_FrameVisualizer "Flag that enables building IWearFrameVisualizer module" OFF)
+option(ENABLE_FrameVisualizer "Flag that enables building IWearFrameVisualizer module" ${iDynTree_FOUND})
 
 # Flag to enable IWearLogger device
 find_package(robometry QUIET)
