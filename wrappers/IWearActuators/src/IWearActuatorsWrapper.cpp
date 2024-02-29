@@ -226,7 +226,7 @@ bool IWearActuatorsWrapper::attachAll(const yarp::dev::PolyDriverList& driverLis
     }
     
     // Save key that identifies the driver
-    driver->key;
+    pImpl->attachedWearableDeviceKey = driver->key;
 
     return attach(driver->poly);
 }
