@@ -20,7 +20,7 @@ constexpr double DefaultPeriod = 0.01;
 class IWearActuatorsWrapper::impl : public wearable::msg::WearableActuatorCommand
 {
 public:
-    std::string attachedWearableDeviceKey = "defaultIWearActuatorsWrapperDevice"
+    std::string attachedWearableDeviceKey = "defaultIWearActuatorsWrapperDevice";
 
     std::string actuatorCommandInputPortName;
     yarp::os::BufferedPort<wearable::msg::WearableActuatorCommand> actuatorCommandInputPort;
