@@ -309,6 +309,14 @@ bool HapticGlove::open(yarp::os::Searchable& config)
         m_pImpl->sensegloveHapticActuatorVector.push_back(
             std::make_shared<SenseGloveImpl::SenseGloveHapticActuator>(
                 m_pImpl.get(),
+                m_pImpl->hapticActuatorPrefix
+                    + "HapticFeedback"));
+    }
+
+    for (size_t i = 0; i < m_pImpl->gloveData.humanFingerNames.size(); i++) {
+        m_pImpl->sensegloveHapticActuatorVector.push_back(
+            std::make_shared<SenseGloveImpl::SenseGloveHapticActuator>(
+                m_pImpl.get(),
                 m_pImpl->hapticActuatorPrefix + m_pImpl->gloveData.humanFingerNames[i]
                     + "::ForceFeedback"));
     }
@@ -338,6 +346,12 @@ bool HapticGlove::open(yarp::os::Searchable& config)
     for (size_t i = 0; i < m_pImpl->gloveData.humanJointNames.size(); i++)
         m_pImpl->gloveData.humanJointSensorNameIdMap.emplace(
             std::make_pair(m_pImpl->jointSensorPrefix + m_pImpl->gloveData.humanJointNames[i], i));
+
+    for (size_t i = 0; i < m_pImpl->gloveData.humanFingerNames.size(); i++)
+        m_pImpl->gloveData.humanHapticActuatorNameIdMap.emplace(
+            std::make_pair(m_pImpl->hapticActuatorPrefix
+                               + "HapticFeedback",
+                           i));
 
     for (size_t i = 0; i < m_pImpl->gloveData.humanFingerNames.size(); i++)
         m_pImpl->gloveData.humanHapticActuatorNameIdMap.emplace(
@@ -537,21 +551,24 @@ public:
 
     bool setHapticCommand(double& value) const override
     {
+        yError() << LogPrefix << "Wrong method has been called! To set the haptic command please use the setHapticsCommand method.";
+        return false;
+    }
+
+    bool setHapticsCommand(std::vector<double>& forceValue, std::vector<double>& vibrotactileValue) const override
+    {
 
         std::lock_guard<std::mutex> lock(m_gloveImpl->mutex);
 
-        if (!m_gloveImpl->isAvailable(m_actuatorName,
-                                      m_gloveImpl->gloveData.humanHapticActuatorNameIdMap)) {
-            yError() << LogPrefix << "The actuator name (" << m_actuatorName
-                     << ") is not found in the list of actuators.";
-
-            return false;
+        for (size_t i = 0; i < m_gloveImpl->nFingers; i++)
+        {
+            m_gloveImpl->gloveData.fingersHapticFeedback[i] = forceValue[i];
+            m_gloveImpl->gloveData.fingersHapticFeedback[i + 5] = vibrotactileValue[i];
         }
-        m_gloveImpl->gloveData.fingersHapticFeedback
-            [m_gloveImpl->gloveData.humanHapticActuatorNameIdMap[m_actuatorName]] = value;
 
         return true;
     }
+
 
     inline void setStatus(const actuator::ActuatorStatus& status) { m_status = status; }
 
